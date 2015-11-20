@@ -62,9 +62,7 @@ public abstract class PageFactory {
     public WebDriver driver;
 
     public static Logger logger = Logger.getLogger(PageFactory.class);
-
-    public static String baseUrl = TestFactory.getBaseUrl();
-    public static boolean SSLEnabled = false;
+    public static String baseUrl = TestFactory.getBaseUrl(); //TODO: investigate to remove it and replace with TestFactory.getSecureBaseUrl();
 
     public static final int DEFAULT_WAIT_TIME = 60; //default time to patiently wait for finding elements
     public static final String PASS = "PASS";
@@ -120,6 +118,20 @@ public abstract class PageFactory {
     public void AssertPresenceAndDisplay(By by, String strElement) {
         assertTrue(strElement + " MISSING.", isElementPresent(by));
         assertTrue(strElement + " NOT VISIBLE.", driver.findElement(by).isDisplayed());
+    }
+
+    /**
+     * Selects what baseURL to use secured on not depending on environment prefix.
+     *
+     * @return String baseURL||BaseURLSecure
+     */
+    //TODO: it's a total copy of TestFactory.getSecureBaseUrl(); investigate usages to remove it and replace with TestFactory.getSecureBaseUrl();
+    public static String getSecureBaseURL() {
+        if (TestFactory.SSLEnabled) {
+            return TestFactory.secureBaseUrl;
+        } else {
+            return baseUrl;
+        }
     }
 
     /**
@@ -210,7 +222,7 @@ public abstract class PageFactory {
      * @param by Locator of the element on page, which have type By.
      */
     public void waitForElementToBeClickable(By by) {
-        waitForElementToBeClickable(by, DEFAULT_WAIT_TIME);
+        waitForElementIsClickable(by, DEFAULT_WAIT_TIME);
     }
 
     /**
@@ -232,9 +244,9 @@ public abstract class PageFactory {
      * @param by                By, Locator of the element on page, which have type By.
      * @param timeOutInSeconds  int Time(seconds) for waiting of the element
      */
-    public void waitForElementToBeClickable(String message, By by, int timeOutInSeconds) {
+    public void waitForElementIsClickable(String message, By by, int timeOutInSeconds) {
         try {
-            waitForElementToBeClickable(by, timeOutInSeconds);
+            waitForElementIsClickable(by, timeOutInSeconds);
         } catch (Exception ex) {
             fail(message);
         }
@@ -246,7 +258,7 @@ public abstract class PageFactory {
      * @param by               Locator of the element on page, which have type By.
      * @param timeOutInSeconds int Time(seconds) for waiting of the element
      */
-    public void waitForElementToBeClickable(By by, int timeOutInSeconds) {
+    public void waitForElementIsClickable(By by, int timeOutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, timeOutInSeconds);
         wait.until(ExpectedConditions.elementToBeClickable(by));
     }
@@ -403,20 +415,6 @@ public abstract class PageFactory {
     }
 
     /**
-     * Selects what baseURL to use secured on not depending on environment prefix. Always returns http:// for "local"
-     *
-     * @return String baseURL||BaseURLSecure
-     */
-    public static String getSecureBaseURL() {
-        SSLEnabled = System.getProperty("sslEnabled") != null && System.getProperty("sslEnabled").equals("yes");
-        if (SSLEnabled) {
-            return baseUrl.replace("http", "https");
-        } else {
-            return baseUrl;
-        }
-    }
-
-    /**
      * Moving out nasty try/catch form tests' body.
      * TODO: Method should be removed after all tests will use fluent wait.
      *
@@ -458,7 +456,7 @@ public abstract class PageFactory {
      */
     public void logout() {
         logger.info("Making log out...");
-        driver.get(getSecureBaseURL() + "customer/account/logout/");
+        driver.get(TestFactory.getSecureBaseURL() + "customer/account/logout/");
     }
 
     /**
