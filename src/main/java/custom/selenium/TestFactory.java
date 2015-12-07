@@ -156,7 +156,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         String commandLineUrl = System.getProperty("baseUrl");
         if ( commandLineUrl != null){
             logger.info("baseUrl was specified in command line. Using value: " + commandLineUrl);
-            baseUrl = commandLineUrl;
+            baseUrl = commandLineUrl.replace("https", "http"); //always cut off 's' - base URL should be https
         } else {
             logger.warn("baseUrl NOT SPECIFIED. USING DEFAULT:" + baseUrl);
         }
@@ -231,19 +231,16 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             browser = "CHROME";
         }
         if (browser.equals("CHROME")) {
-            setChromeDriverSystemProperty();
-            // Chromedriver does not play well with resizing.
+            //setChromeDriverSystemProperty(); //Locked to use WebDriver from system environment.
             ChromeOptions options = new ChromeOptions();
-            options.addArguments("--start-maximized");
+            options.addArguments("--start-maximized"); // It has issues with resizing.
             /* Chromedriver 2.10 starts with message:
             "You are using an unsupported command-line flag: --ignore-certificate-errors. Stability and security will suffer."
             More details by link: https://code.google.com/p/chromedriver/issues/detail?id=799 */
             options.addArguments("test-type");
-            //get the chrome driver/start chrome
             driver = new ChromeDriver(options);
-        } else if (browser.equals("FIREFOX")) {//get the firefox driver/start firefox
+        } else if (browser.equals("FIREFOX")) {
             driver = new FirefoxDriver();
-            //maximize the browser window
             driver.manage().window().maximize();
         } else if (browser.equals("HTMLUNIT")) {//instantiate a headless driver with javascript enabled
             driver = new HtmlUnitDriver();
@@ -253,13 +250,12 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.SEVERE);
         } else if (browser.equals("INTERNETEXPLORER")) {//assume iedriverserver from http://code.google.com/p/selenium/downloads/list is in one above project directory (where pom.xml is)
             System.setProperty("webdriver.ie.driver", "../IEDriverServer.exe");
-            //get the ie driver/start ie
             driver = new InternetExplorerDriver();
-            //NOTE: To allow specifying credentials in the url:
-            //Had to update add iexplore.exe and explorer.exe DWORD values to the following regedit location, and set their values to 0
-            //HKEY_LOCAL_MACHINE\Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_HTTP_USERNAME_PASSWORD_DISABLE
-            //maximize the browser window
-            // driver.manage().window().maximize();
+            //TODO: automate http auth enable depending on presence of credentials in URL. And restore settings after.
+            /*NOTE: To allow http auth:
+            Had to update add iexplore.exe and explorer.exe DWORD values to the following regedit location, and set their values to 0
+            HKEY_LOCAL_MACHINE\Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_HTTP_USERNAME_PASSWORD_DISABLE */
+            // driver.manage().window().maximize(); //maximize the browser window
         } else {
             fail("UNSUPPORTED BROWSER:" + browser + " VALID BROWSERS: FIREFOX, CHROME, INTERNETEXPLORER, HTMLUNIT, HTMLUNITNOJS");
         }
