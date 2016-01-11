@@ -24,12 +24,13 @@ Install
 -------
 * Java SDK
 * Chromedriver from link: https://sites.google.com/a/chromium.org/chromedriver/downloads
-* Maven
+* Gradle from link http://gradle.org/gradle-download/
 
 
 FAQ:
 ---
-* **Run from CMD:** mvn test -Dbrowser=CHROME -DbaseUrl=http://lea-mage12.lcgosc.com/ -Dtest=SimpleLogin
+* Add GRADLE_HOME/bin to your PATH environment variable.
+* Note that it's not currently possible to set JVM options for Gradle on the command line.
 * **Run from IDE:** JUnit runner, set "VM Options": -ea -DbaseUrl=http://lea-mage12.lcgosc.com/ -Dbrowser=CHROME Then right click on test class/method >> run or debug
 
 
