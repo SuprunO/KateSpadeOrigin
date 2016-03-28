@@ -59,7 +59,7 @@ public class SimpleLogin extends TestFactory {
         logger.info("@Then I am on My Account page as registered user");
         logger.info("Starting step: ");
         logger.info("@Given: I am on homepage as guest");
-        driver.get(baseUrl);
+        driver.get(getBaseUrl());
         logger.info("Starting step: ");
         logger.info("@When I pass new user registration successfully");
         testEmail = loginSignUpPage().registerRandomUser();
@@ -80,7 +80,7 @@ public class SimpleLogin extends TestFactory {
         logger.info("@Then I see 'Thank you for singing up!' message");
         logger.info("Starting step: ");
         logger.info("@Given: I am on homepage as guest");
-        driver.get(baseUrl);
+        driver.get(getBaseUrl());
         logger.info("Starting step: ");
         logger.info("@When I fill field with email");
         logger.info("@And I click on 'Sign Up' button");

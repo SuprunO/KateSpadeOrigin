@@ -156,7 +156,7 @@ public class LoginSignUpPage extends PageFactory {
      * @return String email address of registered user.
      */
     public String registerRandomUser() {
-        String randomUserEmail = getUniqueEmailAddress();
+        String randomUserEmail = TestFactory.getUniqueEmailAddress();
         createAccountIfNotExist(randomUserEmail, CUSTOMER_PASSWORD);
         return randomUserEmail;
     }
@@ -168,7 +168,7 @@ public class LoginSignUpPage extends PageFactory {
      * @return String email address of registered user.
      */
     public String registerRandomUser(String emailSpecifier) {
-        String randomUserEmail = getUniqueEmailAddress(emailSpecifier);
+        String randomUserEmail = TestFactory.getUniqueEmailAddress(emailSpecifier);
         createAccountIfNotExist(randomUserEmail, CUSTOMER_PASSWORD);
         return randomUserEmail;
     }

@@ -32,13 +32,12 @@
 
 package custom.selenium;
 
-import custom.selenium.pages.*;
 import com.saucelabs.common.SauceOnDemandAuthentication;
 import com.saucelabs.common.SauceOnDemandSessionIdProvider;
 import com.saucelabs.junit.SauceOnDemandTestWatcher;
+import custom.selenium.pages.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,8 +54,6 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -64,8 +61,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
-
-import java.io.File;
 
 import static org.junit.Assert.*;
 import static org.openqa.selenium.Platform.WINDOWS;
@@ -78,42 +73,48 @@ import static org.openqa.selenium.Platform.WINDOWS;
  */
 public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
 
-    public WebDriver driver;
-    public SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication("azakowski", "52368b71-d5b9-4df3-8ef1-5fbb27c6f780");
+    protected WebDriver driver;
+    private SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication("azakowski", "52368b71-d5b9-4df3-8ef1-5fbb27c6f780");
     public static Logger logger = Logger.getLogger(TestFactory.class);
 
     /* Config: received from command arguments */
 
-    public static boolean SSLEnabled = false;
-    public static String baseUrl = "http://lea-magedev.lcgosc.com/";
-    public static String secureBaseUrl;
-    private static String[] sauceLabsParameters;
-    private static String sauceLabsSession;
+    private static boolean sslEnabled = false;
+    private static String baseUrl = "http://lea-magedev.lcgosc.com/";
+    private static String secureBaseUrl;
+    private String[] sauceLabsParameters;
+    private String sauceLabsSession;
     private String browser;
 
+    private static String dirTestResults = "./target/logs/";
+
     /* Page Object: Pages declaration */
-    public HomePage homePage;
-    public LoginSignUpPage loginSignUpPage;
-    public MyAccountPages myAccountPages;
-    public Header header;
-    public Footer footer;
+    private HomePage homePage;
+    private LoginSignUpPage loginSignUpPage;
+    private MyAccountPages myAccountPages;
+    private Header header;
+    private Footer footer;
 
     /* Test Case required Details */
+
+
     public static final String FAIL = "FAIL";
     public static final String PASS = "PASS";
-    private static String sessionId;
+    private String sessionId;
 
-    static Timestamp testStartTimestamp;
-    public static String testCaseName;
-    static String testCaseStatus;
+
+
+    private String testCaseStatus;
     static String testResults = "";
     public static String testEmail = "";
     static String testOutput = "";
-    public static String tags = "";
-    public static String orderTime = "";
-    public static long testStartTime;
+    public String tags = "";
+    public String testCaseName;
 
-    public long testCaseExecutionTime;
+    private static Timestamp testStartTimestamp;
+    private long testStartTime;
+    private long testCaseExecutionTime;
+
 
     //TODO: remove the following warnings:
     //log4j:WARN No appenders could be found for logger (custom.selenium.TestFactory).
@@ -121,18 +122,16 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     //log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
 
     @Before
-    public void setUp() throws Exception {
-        setupConfigFromCmd(); //TODO: get and set all properties here
+    public void setUp() throws MalformedURLException {
+        setupConfigFromCmd();
         cleanTestCaseResults(); //for new test
-        // timestamp
-        setStartTimeMark();
+        setStartTimeMark(); // timestamp
         if (sauceLabsSession != null){
             createSauceLabsSession();
         } else {
             setSessionId();
             openChosenBrowser();
         }
-        new URL(baseUrl); //TODO: why it here?
     }
 
     /**
@@ -149,10 +148,10 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     }
 
     private void setSSLProperty() {
-        SSLEnabled = System.getProperty("sslEnabled") != null && System.getProperty("sslEnabled").equals("yes");
+        sslEnabled = System.getProperty("sslEnabled") != null && System.getProperty("sslEnabled").equals("yes");
     }
 
-    private void setBaseUrl() {
+    private static void setBaseUrl() {
         String commandLineUrl = System.getProperty("baseUrl");
         if ( commandLineUrl != null){
             logger.info("baseUrl was specified in command line. Using value: " + commandLineUrl);
@@ -160,7 +159,9 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         } else {
             logger.warn("baseUrl NOT SPECIFIED. USING DEFAULT:" + baseUrl);
         }
-        if (!baseUrl.substring(baseUrl.length() - 1).equals("/")) { baseUrl = baseUrl + "/"; }
+        if (!baseUrl.substring(baseUrl.length() - 1).equals("/")) {
+            baseUrl = baseUrl + "/";
+        }
     }
 
     private void setSecureBaseUrl() {
@@ -170,11 +171,10 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     /**
      * Cleaning all stored data before execute another test.
      */
-    private void cleanTestCaseResults() {
+    private static void cleanTestCaseResults() {
         testEmail = "";
         testOutput = "";
         testResults = "";
-        orderTime = "";
     }
 
     private void setStartTimeMark() {
@@ -193,7 +193,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     /**
      * Method which parses command line parameter "sauceLabsSession" and splits it for next usage
      */
-    public static void setSauceLabsSessionParameters() {
+    public void setSauceLabsSessionParameters() {
         assertFalse("COMMAND LINE PARAMETER: sauceLabsSession CAN NOT BE EMPTY! BECAUSE YOU CHOSE TO RUN TESTS IN SAUCELABS",
                 sauceLabsSession.isEmpty());
         if (sauceLabsSession.contains("IE")){
@@ -314,7 +314,8 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * This is referenced when creating the {@link DesiredCapabilities},
      * so that the Sauce Job is created with the test name.
      */
-    public @Rule TestName testName = new TestName();
+    @Rule
+    public TestName testName = new TestName();
 
     /**
      * JUnit Rule which will mark the Sauce Job as passed/failed when the test succeeds or fails.
@@ -322,6 +323,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      */
     @Rule
     public SauceOnDemandTestWatcher resultReportingTestWatcher = new SauceOnDemandTestWatcher(this, authentication){
+
         @Override
         protected void failed(Throwable e, Description d) {
             if (sauceLabsSession != null && !sauceLabsSession.isEmpty()){
@@ -331,11 +333,10 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             log(e.getMessage());
             logTestResultError("Exception! " + e);
             logTestResultError("Test requirements in: " + getTestCaseName() + " failed!");
-            logTestOutputToJSON(testStartTimestamp.toString(), testName.getMethodName(), testCaseStatus, testResults,
-                    testEmail, testCaseExecutionTime, browser, orderTime, testOutput,
-                    tags, sessionId);
+            logTestOutputToXML();
             System.out.println("================================================================================");
         }
+
         @Override
         protected void succeeded(Description d) {
             if (sauceLabsSession != null && !sauceLabsSession.isEmpty()){
@@ -343,9 +344,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             }
             testCaseStatus = PASS;
             logTestResult("Test requirements in: " + getTestCaseName() + " successfully passed!");
-            logTestOutputToJSON(testStartTimestamp.toString(), testName.getMethodName(), testCaseStatus, testResults,
-                    testEmail, testCaseExecutionTime, browser, orderTime, testOutput,
-                    tags, sessionId);
+            logTestOutputToXML();
             System.out.println("================================================================================");
         }
     };
@@ -455,51 +454,48 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * filename by appending the current time in milliseconds to the name
      * of the file.  For example: testCaseName1381859201591.json
      *
-     * @param timeStamp             time the test started
-     * @param testCaseName          class name of the test
-     * @param testCaseStatus        one of pass | fail | test error
-     * @param validationResults     passing or failing validation results.
-     * @param userName              the robot's email address
-     * @param testCaseExecutionTime total execution time of the test
-     * @param browser               which browser or selenium driver (i.e., IOs)
-     * @param stdout_output         the output from the test itself
-     * @param tags                  any tags that might identify the test (e.g., Smoke)
-     * @param orderTime             if applicable, exact time from pushing the Order button
-     * @param sessionId             the test_run sessionId for grouping tests together
-     * TODO: get rid of this shit! Refactor and implement XML output.
+     * timeStamp             time the test started
+     * testCaseName          class name of the test
+     * testCaseStatus        one of pass | fail | test error
+     * validationResults     passing or failing validation results.
+     * userName              the robot's email address
+     * testCaseExecutionTime total execution time of the test
+     * browser               which browser or selenium driver (i.e., IOs)
+     * stdout_output         the output from the test itself
+     * tags                  any tags that might identify the test (e.g., Smoke)
+     * sessionId             the test_run sessionId for grouping tests together
+     * TODO: get rid of this shit! Refactor!!
      * TODO: Implement connection between executed tests per single run to create reports.
      */
-    public void logTestOutputToJSON(String timeStamp, String testCaseName, String testCaseStatus, String validationResults,
-                                    String userName, long testCaseExecutionTime, String browser,
-                                    String orderTime, String stdout_output, String tags, String sessionId) {
-        // Create a JSON object
-        final String jsonExt = ".json";
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("timestamp", timeStamp);
-        jsonObject.put("testcase", testCaseName);
-        jsonObject.put("status", testCaseStatus);
-        jsonObject.put("validationstring", validationResults);
-        jsonObject.put("user", userName);
-        jsonObject.put("executiontime", testCaseExecutionTime);
-        jsonObject.put("browser", browser);
-        jsonObject.put("order_time", orderTime);
-        jsonObject.put("stdout", stdout_output);
-        jsonObject.put("tags", tags);
-        jsonObject.put("session_id", sessionId);
+    public void logTestOutputToXML() {
+        XMLioFactory testResultXML = new XMLioFactory();
+
+        testResultXML.addParentNode("test");
+        testResultXML.appendChildNodeWithText("timestamp", testStartTimestamp.toString());
+        testResultXML.appendChildNodeWithText("testcase", testCaseName);
+        testResultXML.appendChildNodeWithText("status", testCaseStatus);
+        testResultXML.appendChildNodeWithText("validationstring", testResults);
+        testResultXML.appendChildNodeWithText("user", testEmail);
+        testResultXML.appendChildNodeWithText("executiontime", String.valueOf(testCaseExecutionTime));
+        testResultXML.appendChildNodeWithText("browser", browser);
+        testResultXML.appendChildNodeWithText("stdout", testOutput);
+        testResultXML.appendChildNodeWithText("tags", tags);
+        testResultXML.appendChildNodeWithText("session_id", sessionId);
+
         long current_time = new Date().getTime();
-        File logDir = new File("./target/logs/");
-        if( !logDir.exists()) {
-            logDir.mkdir();
-        }
-        try {
-            FileWriter jsonFile = new FileWriter("./target/logs/" + testCaseName + String.valueOf(current_time) + jsonExt);
-            logger.info("Logging to file: " + testCaseName + String.valueOf(current_time) + jsonExt);
-            jsonFile.write(jsonObject.toJSONString());
-            jsonFile.flush();
-            jsonFile.close();
-        } catch (IOException e) {
-            logger.error("Exception setting up file to write!" + e);
-        }
+//TODO: remove dir code after check that it's not needed.
+//        File logDir = new File(dirTestResults);
+//        if( !logDir.exists()) {
+//            logDir.mkdir();
+//        }
+
+        testResultXML.writeXMLtoFile(dirTestResults + testCaseName + String.valueOf(current_time) + ".xml");
+
+
+
+
+
+
     }
 
     /**
@@ -530,41 +526,11 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * @return String baseURL||BaseURLSecure
      */
     public static String getSecureBaseURL() {
-        if (SSLEnabled) {
+        if (sslEnabled) {
             return secureBaseUrl;
         } else {
             return baseUrl;
         }
-    }
-
-
-    /**
-     * Registers a user with a random email address, formed using getUniqueEmailAddress()
-     *
-     * @return String email address of registered user.
-     */
-    public String registerRandomUser() {
-       return registerRandomUser("");
-    }
-
-    /**
-     * Registers a user with a random email address, formed using getUniqueEmailAddress(emailSpecifier)
-     *
-     * @param emailSpecifier String first part of email address
-     * @return String email address of registered user.
-     */
-    public String registerRandomUser(String emailSpecifier) {
-        String randomUserEmail = getUniqueEmailAddress(emailSpecifier);
-        loginSignUpPage().createAccountIfNotExist(randomUserEmail, LoginSignUpPage.CUSTOMER_PASSWORD);
-        return randomUserEmail;
-    }
-    /**
-     * Method that makes customer not logged in status
-     * It use the approach directly opening URL, which send request to log out the customer
-     */
-    public void logout() {
-        logger.info("Making log out...");
-        driver.get(getSecureBaseURL() + "customer/account/logout/");
     }
 
     /**
@@ -572,7 +538,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      *
      * @return String random email address
      */
-    public String getUniqueEmailAddress() {
+    public static String getUniqueEmailAddress() {
         return getUniqueEmailAddress("testy_testy");
     }
 
@@ -582,7 +548,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * @param login String first part of email address
      * @return String random email address
      */
-    public String getUniqueEmailAddress(String login) {
+    public static String getUniqueEmailAddress(String login) {
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         Date currentDateAndTime = new Date();
         String dateTime = dateFormat.format(currentDateAndTime);

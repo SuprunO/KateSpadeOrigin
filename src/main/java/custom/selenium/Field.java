@@ -42,15 +42,34 @@ import org.openqa.selenium.By;
  * @author Speroteck QA Team (qa@speroteck.com)
  */
 public class Field {
-
-    public By locator;
-    public String value;
-    public String type;
+    private By locator;
+    private String value;
+    private String type;
 
     public Field(String t, By l, String v) {
-        this.type = t;
-        this.locator = l;
-        this.value = v;
+        type = t;
+        locator = l;
+        value = v;
     }
 
+    /**
+     * @return the locator of the current input field
+     */
+    public By getLocator() {
+        return locator;
+    }
+
+    /**
+     * @return the Type of the current input field: input|dropdown
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @return the value that should be entered into the current input field
+     */
+    public String getValue() {
+        return value;
+    }
 }

@@ -44,7 +44,6 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertEquals;
@@ -81,8 +80,8 @@ public abstract class PageFactory {
     public static final By WEB_PAGE_TODO_MESSAGE = By.xpath("//div[@class='std' and contains(text(),'todo')]");
 
     //Test User Information
-    public static final String TEST_FIRST_NAME = "AutoFirstNname";
-    public static final String TEST_LAST_NAME = "AutoLastNname";
+    public static final String TEST_FIRST_NAME = "AutoFirstName";
+    public static final String TEST_LAST_NAME = "AutoLastName";
     public static final String CUSTOMER_EMAIL = "test1@speroteck.com";
     public static final String CUSTOMER_PASSWORD = "testthis";
 
@@ -91,7 +90,7 @@ public abstract class PageFactory {
 
     public static final String TEST_CARD_TYPE = "Visa";
     public static final String TEST_CARD_MONTH = "01 - January";
-    public static final String TEST_CARD_YEAR = "2017";
+    public static final String TEST_CARD_YEAR = "2018";
 
     //Test Address information
     public static final String WA_GUEST_STREET_1 = "111 N QUEEN ANNE AVE";
@@ -106,18 +105,10 @@ public abstract class PageFactory {
 
     /**
      * Constructor
-     * @param driver
+     * @param driver WebDriver instance created in TestFactory.class
      */
     protected PageFactory(WebDriver driver) {
         this.driver = driver;
-    }
-
-    /**
-     * use this function to assert the presence and display of an element
-     */
-    public void AssertPresenceAndDisplay(By by, String strElement) {
-        assertTrue(strElement + " MISSING.", isElementPresent(by));
-        assertTrue(strElement + " NOT VISIBLE.", driver.findElement(by).isDisplayed());
     }
 
     /**
@@ -126,35 +117,13 @@ public abstract class PageFactory {
      * @return String baseURL||BaseURLSecure
      */
     //TODO: it's a total copy of TestFactory.getSecureBaseUrl(); investigate usages to remove it and replace with TestFactory.getSecureBaseUrl();
-    public static String getSecureBaseURL() {
-        if (TestFactory.SSLEnabled) {
-            return TestFactory.secureBaseUrl;
-        } else {
-            return baseUrl;
-        }
-    }
-
-    /**
-     * Method to generate a random email user. This returns a julep address.
-     *
-     * @param login String first part of email address
-     * @return String random email address
-     */
-    public String getUniqueEmailAddress(String login) {
-        int randomNumber;
-        Random randomGenerator = new Random();
-        randomNumber = randomGenerator.nextInt(Integer.MAX_VALUE);
-        return login.concat(Integer.toString(randomNumber)).concat("@speroteck.com");
-    }
-
-    /**
-     * Method to generate a random email user. This returns a julep address.
-     *
-     * @return String random email address
-     */
-    public String getUniqueEmailAddress() {
-        return getUniqueEmailAddress("testy_testy");
-    }
+//    public static String getSecureBaseURL() {
+//        if (TestFactory.SSLEnabled) {
+//            return TestFactory.secureBaseUrl;
+//        } else {
+//            return baseUrl;
+//        }
+//    }
 
     /**
      * This method is waiting during "DEFAULT_WAIT_TIME"(60 seconds) till the element will be present on the current page.
@@ -188,6 +157,7 @@ public abstract class PageFactory {
         try {
             waitForElementIsVisible(by, timeOutInSeconds);
         } catch (Exception ex) {
+            logger.error(ex);
             fail(message);
         }
     }
@@ -203,6 +173,7 @@ public abstract class PageFactory {
         try {
             waitForElementIsVisible(by, DEFAULT_WAIT_TIME);
         } catch (Exception ex) {
+            logger.error(ex);
             fail(message);
         }
     }
@@ -248,6 +219,7 @@ public abstract class PageFactory {
         try {
             waitForElementIsClickable(by, timeOutInSeconds);
         } catch (Exception ex) {
+            logger.error(ex);
             fail(message);
         }
     }
@@ -275,6 +247,7 @@ public abstract class PageFactory {
         try {
             waitForElementNotVisible(by, timeOutInSeconds);
         } catch (Exception ex) {
+            logger.error(ex);
             fail(message);
         }
     }
@@ -307,7 +280,7 @@ public abstract class PageFactory {
      * @return Boolean
      */
     public boolean isElementPresent(By elementLocator) {
-        return driver.findElements(elementLocator).size() > 0;
+        return !driver.findElements(elementLocator).isEmpty();
     }
 
     /**
@@ -333,8 +306,8 @@ public abstract class PageFactory {
     public void selectValueInDropDown(By locator, String value) {
         assertTrue("COULD NOT FIND DROPDOWN FIELD: " + locator.toString(), driver.findElement(locator).isDisplayed());
         logger.info("Selecting: \"" + value + "\" in the DropDown: " + locator.toString());
-        Select DropDown = new Select(driver.findElement(locator));
-        DropDown.selectByVisibleText(value);
+        Select dropDown = new Select(driver.findElement(locator));
+        dropDown.selectByVisibleText(value);
     }
 
     /**
@@ -345,10 +318,10 @@ public abstract class PageFactory {
      */
     public void fillFieldsSet(ArrayList<Field> fields) {
         for (Field entry : fields) {
-            if (entry.type.equals("input")) {
-                fillInInput(entry.locator, entry.value);
-            } else if (entry.type.equals("dropdown")) {
-                selectValueInDropDown(entry.locator, entry.value);
+            if ("input".equals(entry.getType())) {
+                fillInInput(entry.getLocator(), entry.getValue());
+            } else if ("dropdown".equals(entry.getType())) {
+                selectValueInDropDown(entry.getLocator(), entry.getValue());
             }
         }
     }
@@ -409,8 +382,8 @@ public abstract class PageFactory {
      */
     public float convertPriceTextToFloatNumber(String extractedText) {
         float parsedFloat;
-        extractedText = extractedText.replace("$", "");
-        parsedFloat = Float.parseFloat(extractedText);
+//        String normalizedText = extractedText.replace("$", "");
+        parsedFloat = Float.parseFloat(extractedText.replace("$", ""));
         return parsedFloat;
     }
 
@@ -430,24 +403,24 @@ public abstract class PageFactory {
     }
 
     /**
-     * This method returns true if 404 page is opened.
+     * This method returns true if current page is 404 page.
      *
      * @return boolean
      */
     public boolean is404Page() {
-        return driver.findElements(PAGE_404_INDICATOR).size() != 0;
+        return !driver.findElements(PAGE_404_INDICATOR).isEmpty();
     }
 
     /**
      * This method will open specified page using additional part of url with base url.
-     * @param pageUrl  additional string to base url
+     * @param pagePath  additional string to base url
      * @param pageName name of the page
      */
-    public void openPage(String pageUrl, String pageName) {
-        logger.info("Opening URL: " + baseUrl + pageUrl);
-        driver.get(baseUrl + pageUrl);
-        assertEquals(pageName + " WAS NOT OPENED!", baseUrl + pageUrl, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + baseUrl + pageUrl, is404Page());
+    public void openPage(String pagePath, String pageName) {
+        logger.info("Opening URL: " + baseUrl + pagePath);
+        driver.get(baseUrl + pagePath);
+        assertEquals(pageName + " WAS NOT OPENED!", baseUrl + pagePath, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + baseUrl + pagePath, is404Page());
     }
 
     /**
@@ -475,7 +448,7 @@ public abstract class PageFactory {
     /**
      * Clicking "OK" on JS Alerts with printing Alert's text.
      */
-    public void acceptAlert() {
+    public void acceptJSAlert() {
         Alert alert=driver.switchTo().alert();
         logger.info("Alert: '" + alert.getText() + "'. Clicking 'OK'");
         alert.accept();
