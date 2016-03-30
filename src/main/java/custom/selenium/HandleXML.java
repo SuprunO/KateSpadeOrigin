@@ -33,6 +33,7 @@
 package custom.selenium;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -40,47 +41,53 @@ import org.w3c.dom.Node;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
- * Class is used to create Field-sets to fill in inputs and select dropdowns using single function.
- * Field set is supposed to be ArrayList, each element consists of String type("input" or "dropdown"),
- * By locator(locator to find current filed or dropdown) and String value(text or value to select or fill in)
+ * Class is used to create XML and handle all needed operations for read, write, parse and format XML.
  *
  * @author Speroteck QA Team (qa@speroteck.com)
  */
-public class XMLioFactory {
+public class HandleXML {
+//TODO: perform clean code refactoring
+//TODO: write javadoc for all methods
+    private static Logger logger = Logger.getLogger(HandleXML.class);
 
-    private static Logger logger = Logger.getLogger(XMLioFactory.class);
+    private DocumentBuilder builder;
+    private Document temporaryXML;
+    private Transformer transformer;
+    private static final String FILE_TYPE_XML = ".xml";
 
-    DocumentBuilder builder;
-    Document temporaryXML;
-    Transformer transformXML;
-
-    XMLioFactory() {
+    HandleXML() {
         paramLangXML();  // XML initialization
         temporaryXML = builder.newDocument(); //create empty xml
+        initTransformer();
 
     }
 
     private void initTransformer() {
         try {
-            transformXML = TransformerFactory.newInstance().newTransformer();
+            transformer = TransformerFactory.newInstance().newTransformer();
         } catch (TransformerConfigurationException e){
             logger.error(e.getMessage());
         }
-
-        setTranfromerDefault();
+        setXMLDefaults();
     }
 
-    private void setTranfromerDefault() {
-        transformXML.setOutputProperty(OutputKeys.METHOD, "xml");
-        transformXML.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformXML.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+    private void setXMLDefaults() {
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+        transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "yes");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
     }
 
     public void paramLangXML() {
@@ -90,37 +97,6 @@ public class XMLioFactory {
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Запись настроек в XML файл
-     * <?xml version = "1.0"?>
-     * <proxy>
-     *     <use>true</use>
-     *     <host>127.0.0.1</host>
-     *     <port>8080</port>
-     * </proxy>
-     *
-     */
-    public void WriteParamXML()throws TransformerException, IOException {
-
-        Element rootElement = temporaryXML.createElement("proxy");
-
-        Element nameElementTitle = temporaryXML.createElement("use");
-        nameElementTitle.appendChild(temporaryXML.createTextNode("true"));
-        rootElement.appendChild(nameElementTitle);
-
-        Element nameElementCompile = temporaryXML.createElement("host");
-        nameElementCompile.appendChild(temporaryXML.createTextNode("127.0.0.1"));
-        rootElement.appendChild(nameElementCompile);
-
-        Element nameElementRuns = temporaryXML.createElement("port");
-        nameElementRuns.appendChild(temporaryXML.createTextNode("8080"));
-        rootElement.appendChild(nameElementRuns);
-
-        temporaryXML.appendChild(rootElement);
-
-        writeXMLtoFile("proxy.xml");
     }
 
     public void addParentNode(String nodeName) {
@@ -145,29 +121,59 @@ public class XMLioFactory {
         targetNode.appendChild(temporaryXML.createTextNode(text));
     }
 
-    public void appendChildNodeWithText(String childNodeName, String text) {
-        Element childNode = temporaryXML.createElement(childNodeName);
-        Node parentNode = temporaryXML.getDocumentElement();
-        parentNode.appendChild(childNode.appendChild(temporaryXML.createTextNode(text)));
-
+    public Node getElementByTagName(String tagName) {
+        Node targetNode = temporaryXML.getElementsByTagName(tagName).item(0);
+        Assert.assertNotNull("<"+ tagName + "> was not found!", targetNode);
+        return targetNode;
     }
 
     public void appendChildNodeWithText(String parentNodeName, String childNodeName, String text) {
+        Node parentNode = getElementByTagName(parentNodeName);
         Element childNode = temporaryXML.createElement(childNodeName);
-        Node parentNode = temporaryXML.getElementsByTagName(parentNodeName).item(0);
-        parentNode.appendChild(childNode.appendChild(temporaryXML.createTextNode(text)));
+        childNode.appendChild(temporaryXML.createTextNode(text));
+        parentNode.appendChild(childNode);
     }
 
-
-    public void writeXMLtoFile(String targetFile) {
-        initTransformer();
+    private File getFileByPath(String filePath){
+        File targetFile = new File(filePath);
+        targetFile.getParentFile().mkdirs();
         try {
-            logger.info("Logging to file: " + targetFile);
-            transformXML.transform(new DOMSource(temporaryXML), new StreamResult(new FileOutputStream(targetFile)));
-        } catch (IOException e) {
+            targetFile.createNewFile();
+        } catch (IOException e){
+            logger.error("No access to the file:" + filePath, e);
             logger.error(e.getMessage());
-        } catch (TransformerException e) {
+        }
+        return targetFile;
+    }
+
+    private boolean isFileTypePresent(String fileName){
+        return new File(fileName).isFile() && fileName.contains(".");
+    }
+
+    private String setXMLFileType(String fileName){
+        if(!isFileTypePresent(fileName)){
+            return fileName + FILE_TYPE_XML;
+        } else {
+            return fileName;
+        }
+    }
+
+    public void writeXMLtoFile(String filePath) {
+        String normalizedPath = setXMLFileType(filePath);
+        try {
+            DOMSource source = new DOMSource(temporaryXML);
+
+            logger.info("Logging to file: " + normalizedPath);
+            File targetFile = getFileByPath(normalizedPath);
+
+            FileOutputStream outputFile = new FileOutputStream(targetFile);
+
+            StreamResult file = new StreamResult(outputFile);
+            transformer.transform(source, file);
+
+        } catch (Exception e) {
             logger.error(e.getMessage());
+            logger.error("An error occurred during the transformation", e);
         }
     }
 

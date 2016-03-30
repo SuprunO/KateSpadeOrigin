@@ -58,10 +58,10 @@ import static org.junit.Assert.*;
 public abstract class PageFactory {
 
     //the main web driver
-    public WebDriver driver;
+    public static WebDriver driver;
 
     public static Logger logger = Logger.getLogger(PageFactory.class);
-    public static String baseUrl = TestFactory.getBaseUrl(); //TODO: investigate to remove it and replace with TestFactory.getSecureBaseUrl();
+    public static String startUrl = TestFactory.getStartURL();
 
     public static final int DEFAULT_WAIT_TIME = 60; //default time to patiently wait for finding elements
     public static final String PASS = "PASS";
@@ -110,20 +110,6 @@ public abstract class PageFactory {
     protected PageFactory(WebDriver driver) {
         this.driver = driver;
     }
-
-    /**
-     * Selects what baseURL to use secured on not depending on environment prefix.
-     *
-     * @return String baseURL||BaseURLSecure
-     */
-    //TODO: it's a total copy of TestFactory.getSecureBaseUrl(); investigate usages to remove it and replace with TestFactory.getSecureBaseUrl();
-//    public static String getSecureBaseURL() {
-//        if (TestFactory.SSLEnabled) {
-//            return TestFactory.secureBaseUrl;
-//        } else {
-//            return baseUrl;
-//        }
-//    }
 
     /**
      * This method is waiting during "DEFAULT_WAIT_TIME"(60 seconds) till the element will be present on the current page.
@@ -373,7 +359,6 @@ public abstract class PageFactory {
         driver.findElement(locator).click();
     }
 
-
     /**
      * Converts text extracted from the page to float number. For further work with cost, taxes, prices calculations.
      *
@@ -381,10 +366,7 @@ public abstract class PageFactory {
      * @return Float
      */
     public float convertPriceTextToFloatNumber(String extractedText) {
-        float parsedFloat;
-//        String normalizedText = extractedText.replace("$", "");
-        parsedFloat = Float.parseFloat(extractedText.replace("$", ""));
-        return parsedFloat;
+        return Float.parseFloat(extractedText.replace("$", ""));
     }
 
     /**
@@ -417,19 +399,19 @@ public abstract class PageFactory {
      * @param pageName name of the page
      */
     public void openPage(String pagePath, String pageName) {
-        logger.info("Opening URL: " + baseUrl + pagePath);
-        driver.get(baseUrl + pagePath);
-        assertEquals(pageName + " WAS NOT OPENED!", baseUrl + pagePath, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + baseUrl + pagePath, is404Page());
+        logger.info("Opening URL: " + startUrl + pagePath);
+        driver.get(startUrl + pagePath);
+        assertEquals(pageName + " WAS NOT OPENED!", startUrl + pagePath, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + startUrl + pagePath, is404Page());
     }
 
     /**
-     * Method that makes customer not logged in status
+     * Method that makes customer not logged in status for Magento
      * It use the approach directly opening URL, which send request to log out the customer
      */
     public void logout() {
         logger.info("Making log out...");
-        driver.get(TestFactory.getSecureBaseURL() + "customer/account/logout/");
+        driver.get(startUrl + "customer/account/logout/");
     }
 
     /**

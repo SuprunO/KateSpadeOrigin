@@ -72,21 +72,24 @@ import static org.openqa.selenium.Platform.WINDOWS;
  * @author Speroteck QA Team (qa@speroteck.com)
  */
 public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
-
-    protected WebDriver driver;
-    private SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication("azakowski", "52368b71-d5b9-4df3-8ef1-5fbb27c6f780");
+//TODO: wirte Javadoc for all methods
+    protected static WebDriver driver;
+    private static SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication("azakowski", "52368b71-d5b9-4df3-8ef1-5fbb27c6f780");
     public static Logger logger = Logger.getLogger(TestFactory.class);
+    private static final String DEFAULT_LOGGING_LEVEL = "INFO";
 
     /* Config: received from command arguments */
 
     private static boolean sslEnabled = false;
     private static String baseUrl = "http://lea-magedev.lcgosc.com/";
     private static String secureBaseUrl;
-    private String[] sauceLabsParameters;
-    private String sauceLabsSession;
+    private static String[] sauceLabsParameters;
+    private static String sauceLabsSession;
+    private static String sessionId;
     private String browser;
 
-    private static String dirTestResults = "./target/logs/";
+    private static String buildDir;
+    private static String testResultsDir;
 
     /* Page Object: Pages declaration */
     private HomePage homePage;
@@ -97,10 +100,9 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
 
     /* Test Case required Details */
 
-
     public static final String FAIL = "FAIL";
     public static final String PASS = "PASS";
-    private String sessionId;
+
 
 
 
@@ -108,24 +110,18 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     static String testResults = "";
     public static String testEmail = "";
     static String testOutput = "";
-    public String tags = "";
-    public String testCaseName;
+    private String tags = "";
+    protected String testCaseName;
 
     private static Timestamp testStartTimestamp;
-    private long testStartTime;
+    private static long testStartTime;
     private long testCaseExecutionTime;
-
-
-    //TODO: remove the following warnings:
-    //log4j:WARN No appenders could be found for logger (custom.selenium.TestFactory).
-    //log4j:WARN Please initialize the log4j system properly.
-    //log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
 
     @Before
     public void setUp() throws MalformedURLException {
-        setupConfigFromCmd();
-        cleanTestCaseResults(); //for new test
-        setStartTimeMark(); // timestamp
+        setupConfigFromParams();
+        cleanTestCaseResults(); // for new test
+        setStartTimeMark(); //for new test
         if (sauceLabsSession != null){
             createSauceLabsSession();
         } else {
@@ -137,18 +133,36 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     /**
      * Read all Properties placed in the command line. And set values to class variables.
      */
-    private void setupConfigFromCmd() {
+    private void setupConfigFromParams() {
         // Moving here:  get and set all properties
-        logger.info("Test results directory is: target"); //no idea why it's needed
-        setBaseUrl(); //must be always before setSecureBaseUrl();
-        setSecureBaseUrl();
+        setLoggingLevel();
+        setBaseUrls();
         setSSLProperty();
-        setLogsLevel();
         setSauceLabsConfigs();
+        setFolders();
     }
 
-    private void setSSLProperty() {
-        sslEnabled = System.getProperty("sslEnabled") != null && System.getProperty("sslEnabled").equals("yes");
+    private static void setFolders() {
+        if(System.getProperty("buildDir") != null){
+            buildDir = "./" + System.getProperty("buildDir");
+        } else {
+            buildDir = "./target";
+            logger.warn("Using Default Build Directory: "+ buildDir);
+        }
+        testResultsDir = buildDir + "/logs/";
+        logger.info("Test results directory is: "+ testResultsDir);
+   }
+
+    private static void setSSLProperty() {
+        sslEnabled = System.getProperty("sslEnabled") != null && "yes".equals(System.getProperty("sslEnabled"));
+    }
+
+    /**
+     * Separated function to keep the correct order setup:  setBaseUrl() must be always called before setSecureBaseUrl();
+     */
+    private void setBaseUrls() {
+        setBaseUrl();
+        setSecureBaseUrl();
     }
 
     private static void setBaseUrl() {
@@ -159,12 +173,12 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         } else {
             logger.warn("baseUrl NOT SPECIFIED. USING DEFAULT:" + baseUrl);
         }
-        if (!baseUrl.substring(baseUrl.length() - 1).equals("/")) {
+        if (!baseUrl.endsWith("/")) {
             baseUrl = baseUrl + "/";
         }
     }
 
-    private void setSecureBaseUrl() {
+    private static void setSecureBaseUrl() {
         baseUrl = baseUrl.replace("http", "https");
     }
 
@@ -177,13 +191,17 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         testResults = "";
     }
 
-    private void setStartTimeMark() {
+    private static void setStartTimeMark() {
         java.util.Date date = new java.util.Date();
         testStartTimestamp = new Timestamp(date.getTime());
         testStartTime = System.currentTimeMillis();
     }
 
-    private void setSauceLabsConfigs() {
+    /**
+     * Presence of -DsauceLabsSession in commandline means that test are going to be run in SauceLabs
+     * and it contains session configuration, which should be parsed and applied.
+     */
+    private static void setSauceLabsConfigs() {
         sauceLabsSession = System.getProperty("sauceLabsSession");
         if (sauceLabsSession != null){
             setSauceLabsSessionParameters();
@@ -193,7 +211,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     /**
      * Method which parses command line parameter "sauceLabsSession" and splits it for next usage
      */
-    public void setSauceLabsSessionParameters() {
+    private static void setSauceLabsSessionParameters() {
         assertFalse("COMMAND LINE PARAMETER: sauceLabsSession CAN NOT BE EMPTY! BECAUSE YOU CHOSE TO RUN TESTS IN SAUCELABS",
                 sauceLabsSession.isEmpty());
         if (sauceLabsSession.contains("IE")){
@@ -292,12 +310,14 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     /**
      * Method will set specified in command line level for logging
      */
-    private void setLogsLevel() {
+    private void setLoggingLevel() {
+        //TODO: refactor using enumerating of existing logging level values and error/typo handling.
+        String fileTypeProperties = ".properties";
         String logLevel = System.getProperty("logLevel");
         if (logLevel == null || logLevel.isEmpty()) {
-            PropertyConfigurator.configure("INFO.properties");
+            PropertyConfigurator.configure(DEFAULT_LOGGING_LEVEL + fileTypeProperties);
         } else {
-            PropertyConfigurator.configure(logLevel + ".properties");
+            PropertyConfigurator.configure(logLevel + fileTypeProperties);
         }
     }
 
@@ -334,7 +354,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             logTestResultError("Exception! " + e);
             logTestResultError("Test requirements in: " + getTestCaseName() + " failed!");
             logTestOutputToXML();
-            System.out.println("================================================================================");
+            logger.info("================================================================================");
         }
 
         @Override
@@ -345,7 +365,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             testCaseStatus = PASS;
             logTestResult("Test requirements in: " + getTestCaseName() + " successfully passed!");
             logTestOutputToXML();
-            System.out.println("================================================================================");
+            logger.info("================================================================================");
         }
     };
 
@@ -363,7 +383,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      *
      * @param msg String, a message to be printed to sys out and logged
      */
-    public void log(String msg) {
+    public static void log(String msg) {
         logger.info(msg);
         testOutput += msg + "\n";
     }
@@ -373,8 +393,8 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      *
      * @param msg String, a message to be printed to sys out and logged
      */
-    public void logTestResult(String msg) {
-        System.out.println(msg);
+    public static void logTestResult(String msg) {
+        logger.info(msg);
         testResults += msg + "\n";
     }
 
@@ -383,7 +403,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      *
      * @param msg String, a message to be printed to sys out and logged
      */
-    public void logTestResultError(String msg) {
+    public static void logTestResultError(String msg) {
         logger.error(msg);
         testResults += msg + "\n";
     }
@@ -464,38 +484,24 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * stdout_output         the output from the test itself
      * tags                  any tags that might identify the test (e.g., Smoke)
      * sessionId             the test_run sessionId for grouping tests together
-     * TODO: get rid of this shit! Refactor!!
+     * TODO: Refactor!!
      * TODO: Implement connection between executed tests per single run to create reports.
      */
     public void logTestOutputToXML() {
-        XMLioFactory testResultXML = new XMLioFactory();
+        HandleXML testResultXML = new HandleXML();
 
         testResultXML.addParentNode("test");
-        testResultXML.appendChildNodeWithText("timestamp", testStartTimestamp.toString());
-        testResultXML.appendChildNodeWithText("testcase", testCaseName);
-        testResultXML.appendChildNodeWithText("status", testCaseStatus);
-        testResultXML.appendChildNodeWithText("validationstring", testResults);
-        testResultXML.appendChildNodeWithText("user", testEmail);
-        testResultXML.appendChildNodeWithText("executiontime", String.valueOf(testCaseExecutionTime));
-        testResultXML.appendChildNodeWithText("browser", browser);
-        testResultXML.appendChildNodeWithText("stdout", testOutput);
-        testResultXML.appendChildNodeWithText("tags", tags);
-        testResultXML.appendChildNodeWithText("session_id", sessionId);
-
-        long current_time = new Date().getTime();
-//TODO: remove dir code after check that it's not needed.
-//        File logDir = new File(dirTestResults);
-//        if( !logDir.exists()) {
-//            logDir.mkdir();
-//        }
-
-        testResultXML.writeXMLtoFile(dirTestResults + testCaseName + String.valueOf(current_time) + ".xml");
-
-
-
-
-
-
+        testResultXML.appendChildNodeWithText("test", "timestamp", testStartTimestamp.toString());
+        testResultXML.appendChildNodeWithText("test", "testcase", testCaseName);
+        testResultXML.appendChildNodeWithText("test", "status", testCaseStatus);
+        testResultXML.appendChildNodeWithText("test", "validationstring", testResults);
+        testResultXML.appendChildNodeWithText("test", "user", testEmail);
+        testResultXML.appendChildNodeWithText("test", "executiontime", String.valueOf(testCaseExecutionTime));
+        testResultXML.appendChildNodeWithText("test", "browser", browser);
+        testResultXML.appendChildNodeWithText("test", "stdout", testOutput);
+        testResultXML.appendChildNodeWithText("test", "tags", tags);
+        testResultXML.appendChildNodeWithText("test", "session_id", sessionId);
+        testResultXML.writeXMLtoFile(testResultsDir + testCaseName + String.valueOf(new Date().getTime()));
     }
 
     /**
@@ -516,16 +522,12 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         return sessionId;
     }
 
-    public static String getBaseUrl() {
-        return baseUrl;
-    }
-
     /**
-     * Selects what baseURL to use secured on not depending on environment prefix.
+     * Selects what baseURL to use secured on not depending on environment prefix. Direct access should be avoided.
      *
      * @return String baseURL||BaseURLSecure
      */
-    public static String getSecureBaseURL() {
+    public static String getStartURL() {
         if (sslEnabled) {
             return secureBaseUrl;
         } else {

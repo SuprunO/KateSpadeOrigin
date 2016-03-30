@@ -1,30 +1,39 @@
 apply plugin: 'java'
+apply plugin: 'idea'
 apply plugin: 'maven'
 
 group = 'custom'
 version = '1.0-SNAPSHOT'
+description = """Custom Framework based on selenium Webdriver"""
+buildDir = 'target'
 
-description = """"""
+String fileSeparator = System.getProperty("file.separator")
+String buildDirName = project.buildDir.toString().replace(projectDir.toString() + fileSeparator, "")
+test.systemProperty('buildDir', buildDirName) //Synchronize logs folder
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
-
-
 repositories {
-        
-     maven { url "http://repository-saucelabs.forge.cloudbees.com/release" }
-     maven { url "http://repo.maven.apache.org/maven2" }
+    mavenCentral()
+    maven { url "http://repository-saucelabs.forge.cloudbees.com/release" }
+    maven { url "http://repo.maven.apache.org/maven2" }
 }
+
+
 dependencies {
+    compile group: 'junit', name: 'junit', version:'4.10'
     compile group: 'org.seleniumhq.selenium', name: 'selenium-java', version:'2.48.2'
     compile group: 'org.seleniumhq.selenium', name: 'selenium-server', version:'2.48.2'
     compile group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version:'2.48.2'
     compile group: 'org.seleniumhq.selenium', name: 'selenium-htmlunit-driver', version:'2.48.2'
-    compile group: 'junit', name: 'junit', version:'4.10'
+
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version:'1.1'
     compile group: 'org.testng', name: 'testng', version:'6.8.8'
     compile group: 'com.beust', name: 'jcommander', version:'1.30'
     compile group: 'log4j', name: 'log4j', version:'1.2.17'
     compile group: 'com.saucelabs', name: 'sauce_junit', version:'[1.0.0,)'
 }
+
+
+

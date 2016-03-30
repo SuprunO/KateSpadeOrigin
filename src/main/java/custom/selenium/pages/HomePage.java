@@ -42,6 +42,7 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static custom.selenium.TestFactory.getStartURL;
 import static org.junit.Assert.*;
 
 /**
@@ -64,10 +65,10 @@ public class HomePage extends PageFactory {
      * Opens Home Page entering url into the address field.
      */
     public void open() {
-        logger.info("Opening URL: " + baseUrl);
-        driver.get(baseUrl);
-        assertEquals("HOME PAGE WAS NOT OPENED", baseUrl, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + baseUrl, is404Page());
+        logger.info("Opening URL: " + getStartURL());
+        driver.get(getStartURL());
+        assertEquals("HOME PAGE WAS NOT OPENED", getStartURL(), driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL(), is404Page());
     }
 
     /**

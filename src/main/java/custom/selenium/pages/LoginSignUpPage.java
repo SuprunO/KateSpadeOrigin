@@ -41,6 +41,7 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.ArrayList;
 
+import static custom.selenium.TestFactory.getStartURL;
 import static org.junit.Assert.*;
 
 
@@ -81,10 +82,10 @@ public class LoginSignUpPage extends PageFactory {
      * This method will open Login/Sign Up page.
      */
     public void open() {
-        logger.info("Opening URL: " + baseUrl + PAGE_LOGIN_SIGN_UP);
-        driver.get(baseUrl + PAGE_LOGIN_SIGN_UP);
-        assertEquals("LOGIN/SIGN UP PAGE WAS NOT OPENED", baseUrl + PAGE_LOGIN_SIGN_UP, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + baseUrl + PAGE_LOGIN_SIGN_UP, is404Page());
+        logger.info("Opening URL: " + getStartURL() + PAGE_LOGIN_SIGN_UP);
+        driver.get(getStartURL() + PAGE_LOGIN_SIGN_UP);
+        assertEquals("LOGIN/SIGN UP PAGE WAS NOT OPENED", getStartURL() + PAGE_LOGIN_SIGN_UP, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_LOGIN_SIGN_UP, is404Page());
     }
 
     /**

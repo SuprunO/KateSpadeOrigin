@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static custom.selenium.TestFactory.getSecureBaseURL;
+import static custom.selenium.TestFactory.getStartURL;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -209,70 +209,70 @@ public class MyAccountPages extends PageFactory{
      * This method will open My Account page, My account information section.
      */
     public void open() {
-        logger.info("Opening URL: " + getSecureBaseURL() + PAGE_MY_INFO);
-        driver.get(getSecureBaseURL() + PAGE_MY_INFO);
-        assertEquals("MY ACCOUNT PAGE WAS NOT OPENED!", getSecureBaseURL() + PAGE_MY_INFO, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getSecureBaseURL() + PAGE_MY_INFO, is404Page());
+        logger.info("Opening URL: " + getStartURL() + PAGE_MY_INFO);
+        driver.get(getStartURL() + PAGE_MY_INFO);
+        assertEquals("MY ACCOUNT PAGE WAS NOT OPENED!", getStartURL() + PAGE_MY_INFO, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_MY_INFO, is404Page());
     }
 
     /**
      * This method will open My Account page, My account information section.
      */
     public void openMyJulesRewardsPage() {
-        logger.info("Opening URL: " + getSecureBaseURL() + PAGE_MY_JULES_REWARDS_PAGE);
-        driver.get(getSecureBaseURL() + PAGE_MY_JULES_REWARDS_PAGE);
-        assertEquals("MY ACCOUNT PAGE WAS NOT OPENED!", getSecureBaseURL() + PAGE_MY_JULES_REWARDS_PAGE, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getSecureBaseURL() + PAGE_MY_JULES_REWARDS_PAGE, is404Page());
+        logger.info("Opening URL: " + getStartURL() + PAGE_MY_JULES_REWARDS_PAGE);
+        driver.get(getStartURL() + PAGE_MY_JULES_REWARDS_PAGE);
+        assertEquals("MY ACCOUNT PAGE WAS NOT OPENED!", getStartURL() + PAGE_MY_JULES_REWARDS_PAGE, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_MY_JULES_REWARDS_PAGE, is404Page());
     }
 
     /**
      * This method will open My Account page, Order History section.
      */
     public void openOrderHistory() {
-        logger.info("Opening URL: " + getSecureBaseURL() + PAGE_ORDER_HISTORY);
-        driver.get(getSecureBaseURL() + PAGE_ORDER_HISTORY);
-        assertEquals("ADD NEW CREDIT CARD PAGE WAS NOT OPENED!", getSecureBaseURL() + PAGE_ORDER_HISTORY, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getSecureBaseURL() + PAGE_ORDER_HISTORY, is404Page());
+        logger.info("Opening URL: " + getStartURL() + PAGE_ORDER_HISTORY);
+        driver.get(getStartURL() + PAGE_ORDER_HISTORY);
+        assertEquals("ADD NEW CREDIT CARD PAGE WAS NOT OPENED!", getStartURL() + PAGE_ORDER_HISTORY, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_ORDER_HISTORY, is404Page());
     }
 
     /**
      * This method will open My Account page, Add new credit card section.
      */
     private void openMyAccountInviteFriendsSection() {
-        logger.info("Opening URL: " + getSecureBaseURL() + PAGE_INVITE_FRIENDS);
-        driver.get(getSecureBaseURL() + PAGE_INVITE_FRIENDS);
-        assertEquals("INVITE FRIENDS PAGE WAS NOT OPENED!", getSecureBaseURL() + PAGE_INVITE_FRIENDS, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getSecureBaseURL() + PAGE_INVITE_FRIENDS, is404Page());
+        logger.info("Opening URL: " + getStartURL() + PAGE_INVITE_FRIENDS);
+        driver.get(getStartURL() + PAGE_INVITE_FRIENDS);
+        assertEquals("INVITE FRIENDS PAGE WAS NOT OPENED!", getStartURL() + PAGE_INVITE_FRIENDS, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_INVITE_FRIENDS, is404Page());
     }
 
     /**
      * This method will open My Account page, Add new credit card section.
      */
     private void openMyAccountAddNewCC() {
-        logger.info("Opening URL: " + getSecureBaseURL() + PAGE_ADD_NEW_CARD);
-        driver.get(getSecureBaseURL() + PAGE_ADD_NEW_CARD);
-        assertEquals("ADD NEW CREDIT CARD PAGE WAS NOT OPENED!", getSecureBaseURL() + PAGE_ADD_NEW_CARD, driver.getCurrentUrl());// TODO: tests fails on this. Check it please
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getSecureBaseURL() + PAGE_ADD_NEW_CARD, is404Page());
+        logger.info("Opening URL: " + getStartURL() + PAGE_ADD_NEW_CARD);
+        driver.get(getStartURL() + PAGE_ADD_NEW_CARD);
+        assertEquals("ADD NEW CREDIT CARD PAGE WAS NOT OPENED!", getStartURL() + PAGE_ADD_NEW_CARD, driver.getCurrentUrl());// TODO: tests fails on this. Check it please
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_ADD_NEW_CARD, is404Page());
     }
 
     /**
      * Opens My Account page, Edit My Box section.
      */
     public void openMyAccountEditMyBox() {
-        logger.info("Opening URL: " + getSecureBaseURL() + PAGE_EDIT_MY_BOX);
-        driver.get(getSecureBaseURL() + PAGE_EDIT_MY_BOX);
-        assertEquals("EDIT MY BOX PAGE WAS NOT OPENED!", getSecureBaseURL() + PAGE_EDIT_MY_BOX, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getSecureBaseURL() + PAGE_EDIT_MY_BOX, is404Page());
+        logger.info("Opening URL: " + getStartURL() + PAGE_EDIT_MY_BOX);
+        driver.get(getStartURL() + PAGE_EDIT_MY_BOX);
+        assertEquals("EDIT MY BOX PAGE WAS NOT OPENED!", getStartURL() + PAGE_EDIT_MY_BOX, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_EDIT_MY_BOX, is404Page());
     }
 
     /**
      * Opens My Account page, My Monthly Box section.
      */
     public void openMyAccountMyMonthlyBox() {
-        logger.info("Opening URL: " + getSecureBaseURL() + PAGE_MY_MONTHLY_BOX);
-        driver.get(getSecureBaseURL() + PAGE_MY_MONTHLY_BOX);
-        assertEquals("EDIT MY BOX PAGE WAS NOT OPENED!", getSecureBaseURL() + PAGE_MY_MONTHLY_BOX, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getSecureBaseURL() + PAGE_MY_MONTHLY_BOX, is404Page());
+        logger.info("Opening URL: " + getStartURL() + PAGE_MY_MONTHLY_BOX);
+        driver.get(getStartURL() + PAGE_MY_MONTHLY_BOX);
+        assertEquals("EDIT MY BOX PAGE WAS NOT OPENED!", getStartURL() + PAGE_MY_MONTHLY_BOX, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_MY_MONTHLY_BOX, is404Page());
     }
 
     /**
@@ -399,20 +399,20 @@ public class MyAccountPages extends PageFactory{
      * This method will open My Account page, Order Details page for first Order in the list.
      */
     public void openOrderHistoryPage() {
-        logger.info("Opening URL: " + baseUrl + PAGE_ORDER_HISTORY);
-        driver.get(baseUrl + PAGE_ORDER_HISTORY);
-        assertEquals("ADD NEW CREDIT CARD PAGE WAS NOT OPENED!", getSecureBaseURL() + PAGE_ORDER_HISTORY, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getSecureBaseURL() + PAGE_ORDER_HISTORY, is404Page());
+        logger.info("Opening URL: " + getStartURL() + PAGE_ORDER_HISTORY);
+        driver.get(getStartURL() + PAGE_ORDER_HISTORY);
+        assertEquals("ADD NEW CREDIT CARD PAGE WAS NOT OPENED!", getStartURL() + PAGE_ORDER_HISTORY, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_ORDER_HISTORY, is404Page());
     }
 
     /**
      * This method will open My Account page, My Wishlist section.
      */
     public void openMyWishlistPage() {
-        logger.info("Opening URL: " + baseUrl + PAGE_MY_WISHLIST);
-        driver.get(baseUrl + PAGE_MY_WISHLIST);
-        assertEquals("ADD NEW CREDIT CARD PAGE WAS NOT OPENED!", getSecureBaseURL() + PAGE_MY_WISHLIST, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getSecureBaseURL() + PAGE_MY_WISHLIST, is404Page());
+        logger.info("Opening URL: " + getStartURL() + PAGE_MY_WISHLIST);
+        driver.get(getStartURL() + PAGE_MY_WISHLIST);
+        assertEquals("ADD NEW CREDIT CARD PAGE WAS NOT OPENED!", getStartURL() + PAGE_MY_WISHLIST, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_MY_WISHLIST, is404Page());
     }
 
     /**
@@ -442,10 +442,10 @@ public class MyAccountPages extends PageFactory{
      * This method will open My Account page, Billing Information section.
      */
     public void openBillingInformationSection() {
-        logger.info("Opening URL: " + getSecureBaseURL() + PAGE_BILLING_INFO);
-        driver.get(getSecureBaseURL() + PAGE_BILLING_INFO);
-        assertEquals("BILLING INFO PAGE WAS NOT OPENED!", getSecureBaseURL() + PAGE_BILLING_INFO, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getSecureBaseURL() + PAGE_BILLING_INFO, is404Page());
+        logger.info("Opening URL: " + getStartURL() + PAGE_BILLING_INFO);
+        driver.get(getStartURL() + PAGE_BILLING_INFO);
+        assertEquals("BILLING INFO PAGE WAS NOT OPENED!", getStartURL() + PAGE_BILLING_INFO, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_BILLING_INFO, is404Page());
     }
 
 
