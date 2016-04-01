@@ -51,7 +51,7 @@ public class SimpleLogin extends TestFactory {
     //@Category({SmokeTests.class, GlobalTests.class})
     @Test
     public void createNewAccountTest() {
-        testCaseName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        setTestCaseName();
         log("Starting test... " + testCaseName);
         logger.info("Test Description: ");
         logger.info("@Given: I am on homepage as guest");
@@ -70,7 +70,7 @@ public class SimpleLogin extends TestFactory {
 
     @Test
     public void newslettersSignUpOnFooterTest() {
-        testCaseName = Thread.currentThread().getStackTrace()[1].getMethodName();
+        setTestCaseName();
         log("Starting test... " + testCaseName);
         logger.info("Test set: Sign up for newsletters from footer");
         logger.info("Test Description: ");
@@ -84,7 +84,7 @@ public class SimpleLogin extends TestFactory {
         logger.info("Starting step: ");
         logger.info("@When I fill field with email");
         logger.info("@And I click on 'Sign Up' button");
-        testEmail = getUniqueEmailAddress();
+        testEmail = getUniqueEmail();
         homePage().fillInInput(By.id("newsletter"), testEmail);
         homePage().clickOnElement(Footer.BUTTON_SIGN_UP, "Button 'Sign Up'");
         logger.info("Starting step: ");

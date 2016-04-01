@@ -65,6 +65,7 @@ public class HomePage extends PageFactory {
      * Opens Home Page entering url into the address field.
      */
     public void open() {
+        getStatusCode(getStartURL());
         logger.info("Opening URL: " + getStartURL());
         driver.get(getStartURL());
         assertEquals("HOME PAGE WAS NOT OPENED", getStartURL(), driver.getCurrentUrl());

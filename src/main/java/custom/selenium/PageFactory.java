@@ -33,6 +33,9 @@
 package custom.selenium;
 
 
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebResponse;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import custom.selenium.pages.Header;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Alert;
@@ -43,6 +46,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -59,6 +63,7 @@ public abstract class PageFactory {
 
     //the main web driver
     public static WebDriver driver;
+    private static WebClient htmlUnitClient = TestFactory.getHtmlUnitClient();
 
     public static Logger logger = Logger.getLogger(PageFactory.class);
     public static String startUrl = TestFactory.getStartURL();
@@ -105,10 +110,10 @@ public abstract class PageFactory {
 
     /**
      * Constructor
-     * @param driver WebDriver instance created in TestFactory.class
+     * @param webDriver WebDriver instance created in TestFactory.class
      */
-    protected PageFactory(WebDriver driver) {
-        this.driver = driver;
+    public PageFactory(WebDriver webDriver) {
+        driver = webDriver;
     }
 
     /**
@@ -434,6 +439,24 @@ public abstract class PageFactory {
         Alert alert=driver.switchTo().alert();
         logger.info("Alert: '" + alert.getText() + "'. Clicking 'OK'");
         alert.accept();
+    }
+
+    public static int getStatusCode(String url) {
+        //TODO: implement check for HtmlUnitClient presence
+        //TODO: Remove console garbage
+        long start = System.currentTimeMillis();
+        logger.info("Validating statusCode for: "+ url);
+        try {
+            HtmlPage page = htmlUnitClient.getPage(url);
+            WebResponse webResponse = page.getWebResponse();
+            int code = webResponse.getStatusCode();
+            return code; // client.getPage(url).getWebResponse().getStatusCode();
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }finally {
+            long duration = System.currentTimeMillis() - start;
+            logger.info("Validating statusCode for: " + url + " (done) | time=" + duration + "ms");
+        }
     }
 
 }

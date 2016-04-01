@@ -32,6 +32,7 @@
 
 package custom.selenium;
 
+import com.gargoylesoftware.htmlunit.WebClient;
 import com.saucelabs.common.SauceOnDemandAuthentication;
 import com.saucelabs.common.SauceOnDemandSessionIdProvider;
 import com.saucelabs.junit.SauceOnDemandTestWatcher;
@@ -59,7 +60,9 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.*;
@@ -72,11 +75,15 @@ import static org.openqa.selenium.Platform.WINDOWS;
  * @author Speroteck QA Team (qa@speroteck.com)
  */
 public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
-//TODO: wirte Javadoc for all methods
-    protected static WebDriver driver;
-    private static SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication("azakowski", "52368b71-d5b9-4df3-8ef1-5fbb27c6f780");
-    public static Logger logger = Logger.getLogger(TestFactory.class);
+//TODO: write Javadoc for all methods
+    protected WebDriver driver;
+    protected static WebClient htmlUnitClient;
+    public static final Logger logger = Logger.getLogger(TestFactory.class);
     private static final String DEFAULT_LOGGING_LEVEL = "INFO";
+    private static final String SAUCE_LABS_USER = "azakowski";
+    private static final String SAUCE_LABS_ACCESS_KEY = "52368b71-d5b9-4df3-8ef1-5fbb27c6f780";
+
+    private static SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication(SAUCE_LABS_USER, SAUCE_LABS_ACCESS_KEY);
 
     /* Config: received from command arguments */
 
@@ -86,7 +93,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     private static String[] sauceLabsParameters;
     private static String sauceLabsSession;
     private static String sessionId;
-    private String browser;
+    private static String browser;
 
     private static String buildDir;
     private static String testResultsDir;
@@ -108,15 +115,66 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
 
     private String testCaseStatus;
     static String testResults = "";
-    public static String testEmail = "";
-    static String testOutput = "";
-    private String tags = "";
+    public static String testEmail;
+    private static String testOutput = "";
     protected String testCaseName;
 
     private static Timestamp testStartTimestamp;
     private static long testStartTime;
     private long testCaseExecutionTime;
 
+    /**
+     * JUnit Rule which will record the test name of the current test.
+     * This is referenced when creating the {@link DesiredCapabilities},
+     * so that the Sauce Job is created with the test name.
+     */
+    @Rule
+    public TestName testName = new TestName();
+
+    /**
+     * JUnit Rule which will mark the Sauce Job as passed/failed when the test succeeds or fails.
+     * And overriding to keep local framework functionality.
+     */
+    //TODO: investigate spliting to testwatchers for non-sauce labs case.
+    @Rule
+    public SauceOnDemandTestWatcher resultReportingTestWatcher = new SauceOnDemandTestWatcher(this, authentication) {
+        @Override protected void failed(Throwable e, Description d) {
+            if (sauceLabsSession != null && !sauceLabsSession.isEmpty()){
+                super.failed(e, d);
+            }
+            failActions(e);
+        }
+
+        @Override protected void succeeded(Description d) {
+            if (sauceLabsSession != null && !sauceLabsSession.isEmpty()){
+                super.succeeded(d);
+            }
+            successActions();
+        }
+
+        private void failActions(Throwable e) {
+            testCaseStatus = FAIL;
+            log(e.getMessage());
+            logTestResultError("Exception! " + e);
+            logTestResultError("Test: " + testCaseName + " failed!");
+            logTestOutputToXML();
+            logger.info("=====================================================================");
+        }
+
+        private void successActions() {
+            testCaseStatus = PASS;
+            logTestResult("Test: " + testCaseName + " passed!");
+            logTestOutputToXML();
+            //TODO: move to the line decorator method with automatic length calculation
+            logger.info("=====================================================================");
+        }
+    };
+
+    /**
+     * WebDriver initialization method. Called before every test.
+     *
+     * @throws MalformedURLException
+     */
     @Before
     public void setUp() throws MalformedURLException {
         setupConfigFromParams();
@@ -128,6 +186,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             setSessionId();
             openChosenBrowser();
         }
+        createHtmlUnitClient();
     }
 
     /**
@@ -135,11 +194,42 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      */
     private void setupConfigFromParams() {
         // Moving here:  get and set all properties
+        long start = System.currentTimeMillis();
         setLoggingLevel();
+        logger.info("Load settings...");
+        setBrowser();
         setBaseUrls();
         setSSLProperty();
         setSauceLabsConfigs();
         setFolders();
+        long setupDuration = System.currentTimeMillis() - start;
+        logger.info("Load settings... (done) | time=" + setupDuration + "ms");
+    }
+
+    /**
+     * Method will set specified in command line level for logging
+     */
+    private void setLoggingLevel() {
+        //TODO: refactor using enumerating of existing logging level values and error/typo handling.
+        String fileTypeProperties = ".properties";
+        String logLevel = System.getProperty("logLevel");
+        if (logLevel == null || logLevel.isEmpty()) {
+            PropertyConfigurator.configure(DEFAULT_LOGGING_LEVEL + fileTypeProperties);
+        } else {
+            PropertyConfigurator.configure(logLevel + fileTypeProperties);
+        }
+    }
+
+    private static void setBrowser() {
+        String flag = System.getProperty("browser");
+        List<String> supportedBrowsers = Arrays.asList("FIREFOX", "CHROME", "INTERNETEXPLORER", "HTMLUNIT", "HTMLUNITNOJS");
+        if (flag != null && supportedBrowsers.contains(flag)){
+            browser = flag;
+            logger.info("Specified Browser is <" + flag + ">");
+        } else {
+            browser = "CHROME";
+            logger.warn("Browser is not specified. Using default: " + browser);
+        }
     }
 
     private static void setFolders() {
@@ -174,12 +264,12 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             logger.warn("baseUrl NOT SPECIFIED. USING DEFAULT:" + baseUrl);
         }
         if (!baseUrl.endsWith("/")) {
-            baseUrl = baseUrl + "/";
+            baseUrl += "/";
         }
     }
 
     private static void setSecureBaseUrl() {
-        baseUrl = baseUrl.replace("http", "https");
+        secureBaseUrl = baseUrl.replace("http", "https");
     }
 
     /**
@@ -233,7 +323,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         capabilities.setCapability(CapabilityType.BROWSER_NAME, sauceLabsParameters[2]);
         capabilities.setCapability(CapabilityType.VERSION, sauceLabsParameters[1]);
         capabilities.setCapability(CapabilityType.PLATFORM, sauceLabsParameters[0]);
-        capabilities.setCapability("name", getTestCaseName());
+        capabilities.setCapability("name", testName.getMethodName());
         driver = new RemoteWebDriver(
                 new URL("http://" + authentication.getUsername() + ":" + authentication.getAccessKey() + "@ondemand.saucelabs.com:80/wd/hub"),
                 capabilities);
@@ -244,10 +334,6 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * Method will open specified browser, which will be used to run test
      */
     private void openChosenBrowser() {
-        browser = System.getProperty("browser"); //Get browser name from the config
-        if (browser == null){
-            browser = "CHROME";
-        }
         if (browser.equals("CHROME")) {
             //setChromeDriverSystemProperty(); //Locked to use WebDriver from system environment.
             ChromeOptions options = new ChromeOptions();
@@ -280,6 +366,14 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     }
 
     /**
+     * Additional headless client just for StatusCode validation before open any URL.
+     */
+    //TODO: implement initialization based on flag and StatusCode Verification based on htmlUnitClient presence
+    private void createHtmlUnitClient() {
+        htmlUnitClient = new WebClient();
+    }
+
+    /**
      * Method will set hardcoded path to chromedriver according to the system which used
      */
     private void setChromeDriverSystemProperty() {
@@ -308,73 +402,24 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     }
 
     /**
-     * Method will set specified in command line level for logging
+     * Manual initialization as JUnit Rule does not work.
+     * Should be called first in testcase method(marked with @Test)
      */
-    private void setLoggingLevel() {
-        //TODO: refactor using enumerating of existing logging level values and error/typo handling.
-        String fileTypeProperties = ".properties";
-        String logLevel = System.getProperty("logLevel");
-        if (logLevel == null || logLevel.isEmpty()) {
-            PropertyConfigurator.configure(DEFAULT_LOGGING_LEVEL + fileTypeProperties);
-        } else {
-            PropertyConfigurator.configure(logLevel + fileTypeProperties);
-        }
-    }
-
-    private String getTestCaseName() {
-        String testTag = System.getProperty("testTag");
-        if(testTag == null || testTag.isEmpty()) {
-            return testName.getMethodName();
-        }
-        return testTag + "\\" + testName.getMethodName();
+    public void setTestCaseName() {
+        testCaseName = Thread.currentThread().getStackTrace()[2].getMethodName();
     }
 
     /**
-     * JUnit Rule which will record the test name of the current test.
-     * This is referenced when creating the {@link DesiredCapabilities},
-     * so that the Sauce Job is created with the test name.
+     * Main actions needed after every test.
      */
-    @Rule
-    public TestName testName = new TestName();
-
-    /**
-     * JUnit Rule which will mark the Sauce Job as passed/failed when the test succeeds or fails.
-     * And overriding to keep local framework functionality.
-     */
-    @Rule
-    public SauceOnDemandTestWatcher resultReportingTestWatcher = new SauceOnDemandTestWatcher(this, authentication){
-
-        @Override
-        protected void failed(Throwable e, Description d) {
-            if (sauceLabsSession != null && !sauceLabsSession.isEmpty()){
-                super.failed(e, d);
-            }
-            testCaseStatus = FAIL;
-            log(e.getMessage());
-            logTestResultError("Exception! " + e);
-            logTestResultError("Test requirements in: " + getTestCaseName() + " failed!");
-            logTestOutputToXML();
-            logger.info("================================================================================");
-        }
-
-        @Override
-        protected void succeeded(Description d) {
-            if (sauceLabsSession != null && !sauceLabsSession.isEmpty()){
-                super.succeeded(d);
-            }
-            testCaseStatus = PASS;
-            logTestResult("Test requirements in: " + getTestCaseName() + " successfully passed!");
-            logTestOutputToXML();
-            logger.info("================================================================================");
-        }
-    };
-
-
     @After
     public void tearDown() {
         long endTime = System.currentTimeMillis();
         testCaseExecutionTime = endTime - testStartTime;
-        logger.info("Finishing test.... " + getTestCaseName());
+        logger.info("Finishing test.... " + testCaseName);
+        if(htmlUnitClient != null) {
+            htmlUnitClient.close();
+        }
         driver.quit();
     }
 
@@ -476,8 +521,8 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      *
      * timeStamp             time the test started
      * testCaseName          class name of the test
-     * testCaseStatus        one of pass | fail | test error
-     * validationResults     passing or failing validation results.
+     * Status                one of pass | fail | test error
+     * results               passing or failing validation results.
      * userName              the robot's email address
      * testCaseExecutionTime total execution time of the test
      * browser               which browser or selenium driver (i.e., IOs)
@@ -492,15 +537,14 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
 
         testResultXML.addParentNode("test");
         testResultXML.appendChildNodeWithText("test", "timestamp", testStartTimestamp.toString());
+        testResultXML.appendChildNodeWithText("test", "session_id", sessionId);
+        testResultXML.appendChildNodeWithText("test", "browser", browser);
         testResultXML.appendChildNodeWithText("test", "testcase", testCaseName);
         testResultXML.appendChildNodeWithText("test", "status", testCaseStatus);
-        testResultXML.appendChildNodeWithText("test", "validationstring", testResults);
+        testResultXML.appendChildNodeWithText("test", "results", testResults);
         testResultXML.appendChildNodeWithText("test", "user", testEmail);
-        testResultXML.appendChildNodeWithText("test", "executiontime", String.valueOf(testCaseExecutionTime));
-        testResultXML.appendChildNodeWithText("test", "browser", browser);
+        testResultXML.appendChildNodeWithText("test", "duration", String.valueOf(testCaseExecutionTime));
         testResultXML.appendChildNodeWithText("test", "stdout", testOutput);
-        testResultXML.appendChildNodeWithText("test", "tags", tags);
-        testResultXML.appendChildNodeWithText("test", "session_id", sessionId);
         testResultXML.writeXMLtoFile(testResultsDir + testCaseName + String.valueOf(new Date().getTime()));
     }
 
@@ -514,7 +558,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             randomizedString.append(randInt.nextInt(10)).toString();
         }
         sessionId = randomizedString.toString();
-        logger.info("Got the following sessionID: " + sessionId);
+        logger.info("sessionID is " + sessionId);
     }
 
     @Override
@@ -540,8 +584,8 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      *
      * @return String random email address
      */
-    public static String getUniqueEmailAddress() {
-        return getUniqueEmailAddress("testy_testy");
+    public static String getUniqueEmail() {
+        return getUniqueEmail("testy_testy");
     }
 
     /**
@@ -550,10 +594,15 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * @param login String first part of email address
      * @return String random email address
      */
-    public static String getUniqueEmailAddress(String login) {
+    public static String getUniqueEmail(String login) {
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         Date currentDateAndTime = new Date();
         String dateTime = dateFormat.format(currentDateAndTime);
         return login.concat(dateTime.concat("@domain.com"));
     }
+
+    public static WebClient getHtmlUnitClient(){
+        return htmlUnitClient;
+    }
+
 }

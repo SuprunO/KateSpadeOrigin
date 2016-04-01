@@ -152,24 +152,24 @@ public class LoginSignUpPage extends PageFactory {
     }
 
     /**
-     * Registers a user with a random email address, formed using getUniqueEmailAddress()
+     * Registers a user with a random email address, formed using getUniqueEmail()
      *
      * @return String email address of registered user.
      */
     public String registerRandomUser() {
-        String randomUserEmail = TestFactory.getUniqueEmailAddress();
+        String randomUserEmail = TestFactory.getUniqueEmail();
         createAccountIfNotExist(randomUserEmail, CUSTOMER_PASSWORD);
         return randomUserEmail;
     }
 
     /**
-     * Registers a user with a random email address, formed using getUniqueEmailAddress(emailSpecifier)
+     * Registers a user with a random email address, formed using getUniqueEmail(emailSpecifier)
      *
      * @param emailSpecifier String first part of email address
      * @return String email address of registered user.
      */
     public String registerRandomUser(String emailSpecifier) {
-        String randomUserEmail = TestFactory.getUniqueEmailAddress(emailSpecifier);
+        String randomUserEmail = TestFactory.getUniqueEmail(emailSpecifier);
         createAccountIfNotExist(randomUserEmail, CUSTOMER_PASSWORD);
         return randomUserEmail;
     }
