@@ -33,9 +33,7 @@
 package custom.selenium;
 
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.WebResponse;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.*;
 import custom.selenium.pages.Header;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Alert;
@@ -47,6 +45,7 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -441,22 +440,44 @@ public abstract class PageFactory {
         alert.accept();
     }
 
-    public static int getStatusCode(String url) {
-        //TODO: implement check for HtmlUnitClient presence
-        //TODO: Remove console garbage
+
+    /**
+     * <p>Indicates that {@link TestFactory.htmlUnitClient } was created and passed to {@link htmlUnitClient}.</p>
+     *
+     * @return true|false
+     */
+    @SuppressWarnings("JavadocReference")
+    private static boolean isHtmlUnitPresent() {
+        return htmlUnitClient != null;
+    }
+
+    /**
+     * <p>Use headless HtmlUnit to establish connection and retrieve returned by Server Status Code.</p>
+     * <p>Throws a {@link FailingHttpStatusCodeException} if the request's status code indicates a request
+     * failure and {@link WebClientOptions#isThrowExceptionOnFailingStatusCode()} returns <tt>true</tt>.
+     *
+     * @param url Target Web page address, Resource address applicable too.
+     * @return Status Code number
+     */
+    public static int getStatusCode(String url){
+        if (!isHtmlUnitPresent()){
+            logger.info("StatusCode validation is skipped");
+            return 0;
+        }
         long start = System.currentTimeMillis();
-        logger.info("Validating statusCode for: "+ url);
+        logger.info("Validating StatusCode for: "+ url);
         try {
-            HtmlPage page = htmlUnitClient.getPage(url);
-            WebResponse webResponse = page.getWebResponse();
-            int code = webResponse.getStatusCode();
-            return code; // client.getPage(url).getWebResponse().getStatusCode();
+            WebRequest webRequest=new WebRequest(new URL(url));
+            WebResponse response = htmlUnitClient.loadWebResponse(webRequest);
+            htmlUnitClient.throwFailingHttpStatusCodeExceptionIfNecessary(response);
+            return response.getStatusCode();
         } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
+            fail(ioe.getMessage());
         }finally {
             long duration = System.currentTimeMillis() - start;
             logger.info("Validating statusCode for: " + url + " (done) | time=" + duration + "ms");
         }
+        return 0; //Unreachable, formally added
     }
 
 }
