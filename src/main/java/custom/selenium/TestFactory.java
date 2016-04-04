@@ -110,9 +110,6 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     public static final String FAIL = "FAIL";
     public static final String PASS = "PASS";
 
-
-
-
     private String testCaseStatus;
     static String testResults = "";
     public static String testEmail;
