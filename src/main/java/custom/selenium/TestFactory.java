@@ -232,6 +232,9 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         }
     }
 
+    /**
+     * setFolders() method can cause asynchronous 'buildDir' location for a separate test if it was defined in gradle properties.
+     */
     private static void setFolders() {
         if(System.getProperty("buildDir") != null){
             buildDir = "./" + System.getProperty("buildDir");
@@ -239,7 +242,10 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             buildDir = "./target";
             logger.warn("Using Default Build Directory: "+ buildDir);
         }
-        testResultsDir = buildDir + "/logs/";
+        if (testResultsDir == null) {
+            String folderPath = new StringBuffer("/logs/Run").append(String.valueOf(new Date().getTime())).append("/").toString();
+            testResultsDir = buildDir + folderPath;
+        }
         logger.info("Test results directory is: "+ testResultsDir);
    }
 
@@ -552,12 +558,14 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * Set a 10-digit to sessionId for tracking test sessions.
      */
     public void setSessionId() {
-        StringBuilder randomizedString = new StringBuilder();
-        for (int i = 0; i < 10; i++) {
-            Random randInt = new Random();
-            randomizedString.append(randInt.nextInt(10)).toString();
+        if (sessionId == null) {
+            StringBuilder randomizedString = new StringBuilder();
+            for (int i = 0; i < 10; i++) {
+                Random randInt = new Random();
+                randomizedString.append(randInt.nextInt(10)).toString();
+            }
+            sessionId = randomizedString.toString();
         }
-        sessionId = randomizedString.toString();
         logger.info("sessionID is " + sessionId);
     }
 
