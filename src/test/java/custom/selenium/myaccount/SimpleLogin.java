@@ -51,8 +51,6 @@ public class SimpleLogin extends TestFactory {
     //@Category({SmokeTests.class, GlobalTests.class})
     @Test
     public void createNewAccountTest() {
-        setTestCaseName();
-        log("Starting test... " + testCaseName);
         logger.info("Test Description: ");
         logger.info("@Given: I am on homepage as guest");
         logger.info("@When I pass new user registration successfully");
@@ -70,8 +68,6 @@ public class SimpleLogin extends TestFactory {
 
     @Test
     public void newslettersSignUpOnFooterTest() {
-        setTestCaseName();
-        log("Starting test... " + testCaseName);
         logger.info("Test set: Sign up for newsletters from footer");
         logger.info("Test Description: ");
         logger.info("@Given: I am on homepage as guest");

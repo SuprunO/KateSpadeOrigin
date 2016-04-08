@@ -41,9 +41,10 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
-import org.junit.runner.Description;
+import org.junit.rules.TestWatcher;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -63,7 +64,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.Assert.*;
 import static org.openqa.selenium.Platform.WINDOWS;
@@ -75,28 +75,40 @@ import static org.openqa.selenium.Platform.WINDOWS;
  * @author Speroteck QA Team (qa@speroteck.com)
  */
 public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
-//TODO: write Javadoc for all methods
-    protected WebDriver driver;
-    protected static WebClient htmlUnitClient;
+    //TODO: write Javadoc for all methods
     public static final Logger logger = Logger.getLogger(TestFactory.class);
     private static final String DEFAULT_LOGGING_LEVEL = "INFO";
-    private static final String SAUCE_LABS_USER = "azakowski";
-    private static final String SAUCE_LABS_ACCESS_KEY = "52368b71-d5b9-4df3-8ef1-5fbb27c6f780";
+    private static final String SAUCE_LABS_URL_ENDING = "@ondemand.saucelabs.com:80/wd/hub";
 
-    private static SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication(SAUCE_LABS_USER, SAUCE_LABS_ACCESS_KEY);
+    protected static SauceOnDemandAuthentication authentication;
 
     /* Config: received from command arguments */
-
     private static boolean sslEnabled = false;
     private static String baseUrl = "http://lea-magedev.lcgosc.com/";
     private static String secureBaseUrl;
     private static String[] sauceLabsParameters;
-    private static String sauceLabsSession;
+    protected static String sauceLabsSession;
     private static String sessionId;
     private static String browser;
-
     private static String buildDir;
     private static String testResultsDir;
+
+    protected WebDriver driver;
+    protected static WebClient htmlUnitClient;
+
+    /* Test Case output required Details */
+    public static final String FAILED = "FAILED";
+    public static final String PASSED = "PASSED";
+
+    protected static String testCaseStatus;
+    protected static String testResults;
+    protected static String testEmail;
+    protected static String testOutput;
+    protected static String testCaseName;
+
+    private static Timestamp testStartTimestamp;
+    private static long testStartTime;
+    private static long testCaseExecutionTime;
 
     /* Page Object: Pages declaration */
     private HomePage homePage;
@@ -104,21 +116,6 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     private MyAccountPages myAccountPages;
     private Header header;
     private Footer footer;
-
-    /* Test Case required Details */
-
-    public static final String FAIL = "FAIL";
-    public static final String PASS = "PASS";
-
-    private String testCaseStatus;
-    static String testResults = "";
-    public static String testEmail;
-    private static String testOutput = "";
-    protected String testCaseName;
-
-    private static Timestamp testStartTimestamp;
-    private static long testStartTime;
-    private long testCaseExecutionTime;
 
     /**
      * JUnit Rule which will record the test name of the current test.
@@ -128,68 +125,73 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     @Rule
     public TestName testName = new TestName();
 
+
     /**
-     * JUnit Rule which will mark the Sauce Job as passed/failed when the test succeeds or fails.
-     * And overriding to keep local framework functionality.
+     * Custom test Rule to create single {@link TestWatcher} Rule based on
+     * parameters in command line. this have to be passed for the
+     * {@link SauceOnDemandTestWatcher} correct construction.
      */
-    //TODO: investigate spliting to testwatchers for non-sauce labs case.
     @Rule
-    public SauceOnDemandTestWatcher resultReportingTestWatcher = new SauceOnDemandTestWatcher(this, authentication) {
-        @Override protected void failed(Throwable e, Description d) {
-            if (sauceLabsSession != null && !sauceLabsSession.isEmpty()){
-                super.failed(e, d);
-            }
-            failActions(e);
-        }
-
-        @Override protected void succeeded(Description d) {
-            if (sauceLabsSession != null && !sauceLabsSession.isEmpty()){
-                super.succeeded(d);
-            }
-            successActions();
-        }
-
-        private void failActions(Throwable e) {
-            testCaseStatus = FAIL;
-            log(e.getMessage());
-            logTestResultError("Exception! " + e);
-            logTestResultError("Test: " + testCaseName + " failed!");
-            logTestOutputToXML();
-            logger.info("=====================================================================");
-        }
-
-        private void successActions() {
-            testCaseStatus = PASS;
-            logTestResult("Test: " + testCaseName + " passed!");
-            logTestOutputToXML();
-            //TODO: move to the line decorator method with automatic length calculation
-            logger.info("=====================================================================");
-        }
-    };
+    public TestWatcherMaker watcherMaker = new TestWatcherMaker(this);
 
     /**
-     * WebDriver initialization method. Called before every test.
-     *
-     * @throws MalformedURLException
+     * {@link TestWatcher} Rule that handles test passed/failed actions.
+     * {@link SauceOnDemandTestWatcher} or {@link TestWatcher} Instance
+     */
+    @Rule
+    public TestWatcher watcher = watcherMaker.getWatcher();
+
+    protected static void failActions(Throwable e) {
+        testCaseStatus = FAILED;
+        log(e.getMessage());
+        logTestResultError("Exception! " + e);
+        logTestResultError("Test: " + testCaseName + " failed!");
+        logTestOutputToXML();
+        logger.info("=====================================================================");
+    }
+
+    protected static void successActions() {
+        testCaseStatus = PASSED;
+        logTestResult("Test: " + testCaseName + " passed!");
+        logTestOutputToXML();
+        //TODO: move to the line decorator method with automatic length calculation
+        logger.info("=====================================================================");
+    }
+
+    /**
+     * Read and Setup Parameters Once for every class with @Tests.
+     */
+    @BeforeClass
+    public static void setUpClass() {
+        setupParamsFromCmd();
+    }
+
+    /**
+     * WebDriver initialization method. Called before every @Test.
      */
     @Before
-    public void setUp() throws MalformedURLException {
-        setupConfigFromParams();
+    public void setUp() {
         cleanTestCaseResults(); // for new test
-        setStartTimeMark(); //for new test
+        long start = System.currentTimeMillis();
+        logger.info("Start Browser...");
         if (sauceLabsSession != null){
             createSauceLabsSession();
         } else {
-            setSessionId();
             openChosenBrowser();
         }
         createHtmlUnitClient();
+        setSessionId();
+        long duration = System.currentTimeMillis() - start;
+        logger.info("Start Browser... (done) | time=" + duration + "ms");
+        testCaseName = testName.getMethodName();
+        setStartTimeMark(); //for new test
+        log("Starting test... " + testCaseName);
     }
 
     /**
      * Read all Properties placed in the command line. And set values to class variables.
      */
-    private void setupConfigFromParams() {
+    private static void setupParamsFromCmd() {
         // Moving here:  get and set all properties
         long start = System.currentTimeMillis();
         setLoggingLevel();
@@ -206,7 +208,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     /**
      * Method will set specified in command line level for logging
      */
-    private void setLoggingLevel() {
+    private static void setLoggingLevel() {
         //TODO: refactor using enumerating of existing logging level values and error/typo handling.
         String fileTypeProperties = ".properties";
         String logLevel = System.getProperty("logLevel");
@@ -230,30 +232,9 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     }
 
     /**
-     * setFolders() method can cause asynchronous 'buildDir' location for a separate test if it was defined in gradle properties.
-     */
-    private static void setFolders() {
-        if(System.getProperty("buildDir") != null){
-            buildDir = "./" + System.getProperty("buildDir");
-        } else {
-            buildDir = "./target";
-            logger.warn("Using Default Build Directory: "+ buildDir);
-        }
-        if (testResultsDir == null) {
-            String folderPath = new StringBuffer("/logs/Run").append(String.valueOf(new Date().getTime())).append("/").toString();
-            testResultsDir = buildDir + folderPath;
-        }
-        logger.info("Test results directory is: "+ testResultsDir);
-   }
-
-    private static void setSSLProperty() {
-        sslEnabled = System.getProperty("sslEnabled") != null && "yes".equals(System.getProperty("sslEnabled"));
-    }
-
-    /**
      * Separated function to keep the correct order setup:  setBaseUrl() must be always called before setSecureBaseUrl();
      */
-    private void setBaseUrls() {
+    private static void setBaseUrls() {
         setBaseUrl();
         setSecureBaseUrl();
     }
@@ -275,13 +256,19 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         secureBaseUrl = baseUrl.replace("http", "https");
     }
 
+    private static void setSSLProperty() {
+        sslEnabled = System.getProperty("sslEnabled") != null && "yes".equals(System.getProperty("sslEnabled"));
+    }
+
     /**
      * Cleaning all stored data before execute another test.
      */
     private static void cleanTestCaseResults() {
-        testEmail = "";
-        testOutput = "";
+        testCaseStatus = "";
         testResults = "";
+        testEmail ="";
+        testOutput = "";
+        testCaseExecutionTime = 0;
     }
 
     private static void setStartTimeMark() {
@@ -298,6 +285,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         sauceLabsSession = System.getProperty("sauceLabsSession");
         if (sauceLabsSession != null){
             setSauceLabsSessionParameters();
+            setSauceLabsApiParameters();
         }
     }
 
@@ -305,7 +293,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * Method which parses command line parameter "sauceLabsSession" and splits it for next usage
      */
     private static void setSauceLabsSessionParameters() {
-        assertFalse("COMMAND LINE PARAMETER: sauceLabsSession CAN NOT BE EMPTY! BECAUSE YOU CHOSE TO RUN TESTS IN SAUCELABS",
+        assertFalse("Command line parameter: '-DsauceLabsSession' cannot be empty!",
                 sauceLabsSession.isEmpty());
         if (sauceLabsSession.contains("IE")){
             sauceLabsSession = sauceLabsSession.replace("IE", "internet explorer");
@@ -314,23 +302,66 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             sauceLabsSession = sauceLabsSession.replace("OSX", "OS X ");
         }
         sauceLabsParameters = sauceLabsSession.split("\\*");
-        assertTrue("INCORRECT FORMAT FOR sauceLabsSessions COMMAND LINE PARAMETER. SHOULD BE LIKE THIS:" +
-                " \"OS*version*browser\"", sauceLabsParameters.length >= 3);
+        assertTrue("'-DsauceLabsSession' format error! Should have the following syntax: " +
+                "\"OS*version*browser\"", sauceLabsParameters.length >= 3);
+    }
+
+    /**
+     * Constructs a new instance, first attempting to populate the
+     * username/access key from system properties/environment variables.
+     * If none are found, then attempt to parse a ~/.sauce-ondemand file.
+     */
+    private static void setSauceLabsApiParameters() {
+        authentication = new SauceOnDemandAuthentication();
+    }
+
+    /**
+     * setFolders() method can cause asynchronous 'buildDir' location for a separate test if it was defined in gradle properties.
+     */
+    private static void setFolders() {
+        if(System.getProperty("buildDir") != null){
+            buildDir = "./" + System.getProperty("buildDir");
+        } else {
+            buildDir = "./target";
+            logger.warn("Using Default Build Directory: "+ buildDir);
+        }
+        if (testResultsDir == null) {
+            String folderPath = new StringBuffer("/logs/Run").append(String.valueOf(new Date().getTime())).append("/").toString();
+            testResultsDir = buildDir + folderPath;
+        }
+        logger.info("Test results directory is: "+ testResultsDir);
     }
 
     /**
      * Method will connect with sauceLabs and create virtual machine with specified parameters
      */
-    private void createSauceLabsSession() throws MalformedURLException {
+    private void createSauceLabsSession() {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability(CapabilityType.BROWSER_NAME, sauceLabsParameters[2]);
         capabilities.setCapability(CapabilityType.VERSION, sauceLabsParameters[1]);
         capabilities.setCapability(CapabilityType.PLATFORM, sauceLabsParameters[0]);
         capabilities.setCapability("name", testName.getMethodName());
-        driver = new RemoteWebDriver(
-                new URL("http://" + authentication.getUsername() + ":" + authentication.getAccessKey() + "@ondemand.saucelabs.com:80/wd/hub"),
-                capabilities);
-        sessionId = ((RemoteWebDriver)driver).getSessionId().toString();
+        driver = new RemoteWebDriver(getSauceLabsAPIAddress(), capabilities);
+        //sessionId = ((RemoteWebDriver)driver).getSessionId().toString();
+    }
+
+    /**
+     * Creates SauceLabs API URL to be used by {@link RemoteWebDriver}
+     *
+     * @return  <code>URL</code> object
+     *
+     * @throws  TestFrameworkRuntimeException
+     *          Encapsulated {@link MalformedURLException} if no protocol
+     *          is specified, or an unknown protocol is found or
+     *          {@code spec} is {@code null}.
+     */
+    private static URL getSauceLabsAPIAddress() {
+        try {
+            return new URL("http://" + authentication.getUsername() + ":" + authentication.getAccessKey()
+                    + SAUCE_LABS_URL_ENDING);
+        } catch (MalformedURLException e){
+            throw new TestFrameworkRuntimeException(e);
+        }
     }
 
     /**
@@ -402,14 +433,6 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             default:
                 logger.error("CHROME IS UNSUPPORTED ON THIS OS:" + currentPlatform);
         }
-    }
-
-    /**
-     * Manual initialization as JUnit Rule does not work.
-     * Should be called first in testcase method(marked with @Test)
-     */
-    public void setTestCaseName() {
-        testCaseName = Thread.currentThread().getStackTrace()[2].getMethodName();
     }
 
     /**
@@ -535,7 +558,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * TODO: Refactor!!
      * TODO: Implement connection between executed tests per single run to create reports.
      */
-    public void logTestOutputToXML() {
+    public static void logTestOutputToXML() {
         HandleXML testResultXML = new HandleXML();
 
         testResultXML.addParentNode("test");
@@ -554,15 +577,17 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     /**
      * Set a 10-digit to sessionId for tracking test sessions.
      */
+    //TODO: Investigate current implementation and remove redundant code
     public void setSessionId() {
-        if (sessionId == null) {
-            StringBuilder randomizedString = new StringBuilder();
-            for (int i = 0; i < 10; i++) {
-                Random randInt = new Random();
-                randomizedString.append(randInt.nextInt(10)).toString();
-            }
-            sessionId = randomizedString.toString();
-        }
+//        if (sessionId == null) {
+//            StringBuilder randomizedString = new StringBuilder();
+//            for (int i = 0; i < 10; i++) {
+//                Random randInt = new Random();
+//                randomizedString.append(randInt.nextInt(10)).toString();
+//            }
+//            sessionId = randomizedString.toString();
+//        }
+        sessionId = ((RemoteWebDriver)driver).getSessionId().toString();
         logger.info("sessionID is " + sessionId);
     }
 

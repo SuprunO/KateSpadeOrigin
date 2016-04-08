@@ -32,6 +32,7 @@ FAQ:
 * Add GRADLE_HOME/bin to your PATH environment variable.
 * Note that it's not currently possible to set JVM options for Gradle on the command line.
 * **Run from IDE:** JUnit runner, set "VM Options": -ea -DbaseUrl=http://lea-mage12.lcgosc.com/ -Dbrowser=CHROME Then right click on test class/method >> run or debug
-
-
+* **SauceLabs: authentication** to run tests in SauceLabs service using REST API:
+** add DSAUCE_USER_NAME and DSAUCE_API_KEY to command line with appropriate values
+** or create a ~/.sauce-ondemand properties-file with "username" and "key" properties
 

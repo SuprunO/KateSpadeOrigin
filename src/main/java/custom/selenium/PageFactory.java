@@ -49,7 +49,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.*;
 
 
@@ -68,7 +67,7 @@ public abstract class PageFactory {
     public static String startUrl = TestFactory.getStartURL();
 
     public static final int DEFAULT_WAIT_TIME = 60; //default time to patiently wait for finding elements
-    public static final String PASS = "PASS";
+    public static final String PASS = "PASSED";
 
 
     /* Static Pages Paths */
