@@ -32,7 +32,19 @@ FAQ:
 * Add GRADLE_HOME/bin to your PATH environment variable.
 * Note that it's not currently possible to set JVM options for Gradle on the command line.
 * **Run from IDE:** JUnit runner, set "VM Options": -ea -DbaseUrl=http://lea-mage12.lcgosc.com/ -Dbrowser=CHROME Then right click on test class/method >> run or debug
-* **SauceLabs: authentication** to run tests in SauceLabs service using REST API:
-** add DSAUCE_USER_NAME and DSAUCE_API_KEY to command line with appropriate values
-** or create a ~/.sauce-ondemand properties-file with "username" and "key" properties
+* **SauceLabs: authentication** to run tests in SauceLabs service using REST API: 
+    * add DSAUCE_USER_NAME=<user> and DSAUCE_API_KEY=<api_key> to command line with appropriate values
+    *  or create a ~/.sauce-ondemand properties-file with "username" and "key" properties
+* **Available parameters:**
+    * -Dbrowser specifies the browser that will be lunched to execute tests.  
+        Values:  CHROME(default) | FIREFOX | IE | HTMLUNIT | HTMLUNITJS
+    * -DbaseUrl  specifies target site for testing ex.: http://mysite.com 
+    * -DsslEnabled  specifies usage of "https://" for current site
+    yes  (if omitted or any other value is specified - "no" will be applied) 
+    * -DlogLevel  specifies the level of logging and the amount of messages that will appear in console
+     Values:  info(default) | error | warn (Case Insensetive) 
+    * -DsauceLabsSession    Runs test in SauceLabs remote browser.
+    Syntax is the following: "OS\*version*browser" 
+    Please note: all whitespaces are collapsed ex: OS X => OSX  
+    see details on: [wiki.saucelabs.com](https://wiki.saucelabs.com/display/DOCS/Test+Configuration+Options) also [configurator to get desired version](https://wiki.saucelabs.com/display/DOCS/Platform+Configurator#/) 
 

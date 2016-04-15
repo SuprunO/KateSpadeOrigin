@@ -36,6 +36,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.saucelabs.common.SauceOnDemandAuthentication;
 import com.saucelabs.common.SauceOnDemandSessionIdProvider;
 import com.saucelabs.junit.SauceOnDemandTestWatcher;
+import com.thoughtworks.selenium.SeleniumLogLevels;
 import custom.selenium.pages.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -45,13 +46,13 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.rules.TestWatcher;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -59,14 +60,11 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.text.*;
+import java.util.*;
 
-import static org.junit.Assert.*;
-import static org.openqa.selenium.Platform.WINDOWS;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -75,14 +73,14 @@ import static org.openqa.selenium.Platform.WINDOWS;
  * @author Speroteck QA Team (qa@speroteck.com)
  */
 public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
-    //TODO: write Javadoc for all methods
+
     public static final Logger logger = Logger.getLogger(TestFactory.class);
-    private static final String DEFAULT_LOGGING_LEVEL = "INFO";
     private static final String SAUCE_LABS_URL_ENDING = "@ondemand.saucelabs.com:80/wd/hub";
 
     protected static SauceOnDemandAuthentication authentication;
 
     /* Config: received from command arguments */
+    private static boolean enableJavascript = false;
     private static boolean sslEnabled = false;
     private static String baseUrl = "http://lea-magedev.lcgosc.com/";
     private static String secureBaseUrl;
@@ -92,6 +90,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     private static String browser;
     private static String buildDir;
     private static String testResultsDir;
+
 
     protected WebDriver driver;
     protected static WebClient htmlUnitClient;
@@ -180,12 +179,22 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             openChosenBrowser();
         }
         createHtmlUnitClient();
-        setSessionId();
+        setSessionId(((RemoteWebDriver)driver).getSessionId().toString());
         long duration = System.currentTimeMillis() - start;
         logger.info("Start Browser... (done) | time=" + duration + "ms");
-        testCaseName = testName.getMethodName();
+        setTestCaseName(testName.getMethodName());
         setStartTimeMark(); //for new test
         log("Starting test... " + testCaseName);
+    }
+
+    /**
+     * Static Field setter, to fix non-static access
+     *
+     * @param value Current(executing) test name
+     */
+    //TODO: Investigate possible collisions on multi-tests runs. And multi-thread running.
+    private static void setTestCaseName(String value){
+        testCaseName = value;
     }
 
     /**
@@ -209,53 +218,83 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * Method will set specified in command line level for logging
      */
     private static void setLoggingLevel() {
-        //TODO: refactor using enumerating of existing logging level values and error/typo handling.
-        String fileTypeProperties = ".properties";
         String logLevel = System.getProperty("logLevel");
-        if (logLevel == null || logLevel.isEmpty()) {
-            PropertyConfigurator.configure(DEFAULT_LOGGING_LEVEL + fileTypeProperties);
+        List<String> validLevels = Arrays.asList(SeleniumLogLevels.INFO, SeleniumLogLevels.WARN, SeleniumLogLevels.ERROR);
+        if (logLevel == null || logLevel.isEmpty() || !isInArrayIgnoreCase(logLevel, validLevels)) {
+            PropertyConfigurator.configure(SeleniumLogLevels.INFO.toUpperCase() + ".properties");
         } else {
-            PropertyConfigurator.configure(logLevel + fileTypeProperties);
+            PropertyConfigurator.configure(logLevel.toUpperCase() + ".properties");
         }
+    }
+
+    /**
+     * Handles Supported Browsers name list for checks
+     *
+     * @return List of Browser which could be launched by current Framework
+     */
+    private static List<String> getSupportedBrowsers(){
+//        Class c =  BrowserType.class;
+//        // выводим поля класса
+//        java.lang.reflect.Field[] fields = c.getDeclaredFields();
+//        for (java.lang.reflect.Field field : fields) {
+//            supportedBrowsers.add(field.getName());
+//        }
+        return Arrays.asList("FIREFOX", "CHROME", "IE", "HTMLUNIT", "HTMLUNITJS");
     }
 
     private static void setBrowser() {
         String flag = System.getProperty("browser");
-        List<String> supportedBrowsers = Arrays.asList("FIREFOX", "CHROME", "INTERNETEXPLORER", "HTMLUNIT", "HTMLUNITNOJS");
-        if (flag != null && supportedBrowsers.contains(flag)){
-            browser = flag;
+        List<String> supportedBrowsers = getSupportedBrowsers();
+        if (flag != null && isInArrayIgnoreCase(flag, supportedBrowsers)){
+            if("HTMLUNITJS".equalsIgnoreCase(flag)){ //TODO: refactor to get rid of this exceptional check
+                enableJavascript = true;
+                flag = flag.replace("JS", "");
+            }
+            browser = flag.toLowerCase();
             logger.info("Specified Browser is <" + flag + ">");
         } else {
-            browser = "CHROME";
+            browser = BrowserType.CHROME;
             logger.warn("Browser is not specified. Using default: " + browser);
         }
     }
 
     /**
-     * Separated function to keep the correct order setup:  setBaseUrl() must be always called before setSecureBaseUrl();
+     * Separated function to keep the correct order setup
+     * {@link #setBaseUrl()} must precede {@link #setSecureBaseUrl()}
      */
     private static void setBaseUrls() {
         setBaseUrl();
         setSecureBaseUrl();
     }
 
+    /**
+     * Unsecured protocol URL {@link #baseUrl} setter.
+     * Leaves default URL if protocol check fails.
+     * Also adds slash character to the end.
+     */
     private static void setBaseUrl() {
         String commandLineUrl = System.getProperty("baseUrl");
-        if ( commandLineUrl != null){
+        if ( commandLineUrl != null && commandLineUrl.contains("http://")){
             logger.info("baseUrl was specified in command line. Using value: " + commandLineUrl);
             baseUrl = commandLineUrl.replace("https", "http"); //always cut off 's' - base URL should be https
         } else {
-            logger.warn("baseUrl NOT SPECIFIED. USING DEFAULT:" + baseUrl);
+            logger.warn("baseUrl wasn't specified. Using Default: " + baseUrl);
         }
         if (!baseUrl.endsWith("/")) {
             baseUrl += "/";
         }
     }
 
+    /**
+     * Setter. Secured URL must have for checkout and my account pages
+     */
     private static void setSecureBaseUrl() {
         secureBaseUrl = baseUrl.replace("http", "https");
     }
 
+    /**
+     * Set trigger for universal URL getter mehtod: {@link #getStartURL()}
+     */
     private static void setSSLProperty() {
         sslEnabled = System.getProperty("sslEnabled") != null && "yes".equals(System.getProperty("sslEnabled"));
     }
@@ -278,8 +317,8 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     }
 
     /**
-     * Presence of -DsauceLabsSession in commandline means that test are going to be run in SauceLabs
-     * and it contains session configuration, which should be parsed and applied.
+     * Triggers SauceLabs configs setup based on "-DsauceLabsSession" presence
+     * which actually switches tests to run in remote SauceLabs Browser.
      */
     private static void setSauceLabsConfigs() {
         sauceLabsSession = System.getProperty("sauceLabsSession");
@@ -290,7 +329,8 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     }
 
     /**
-     * Method which parses command line parameter "sauceLabsSession" and splits it for next usage
+     * Parser for "sauceLabsSession" command line parameter.
+     * Sets {@link #sauceLabsParameters} based on parsed details
      */
     private static void setSauceLabsSessionParameters() {
         assertFalse("Command line parameter: '-DsauceLabsSession' cannot be empty!",
@@ -316,7 +356,8 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     }
 
     /**
-     * setFolders() method can cause asynchronous 'buildDir' location for a separate test if it was defined in gradle properties.
+     * setFolders() method can cause asynchronous 'buildDir' location
+     * if a separate 'buildDir' was defined in build.gradle for some Job/Test
      */
     private static void setFolders() {
         if(System.getProperty("buildDir") != null){
@@ -326,14 +367,15 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             logger.warn("Using Default Build Directory: "+ buildDir);
         }
         if (testResultsDir == null) {
-            String folderPath = new StringBuffer("/logs/Run").append(String.valueOf(new Date().getTime())).append("/").toString();
+            String folderPath = "/logs/Run" + new Date().getTime() + "/";
             testResultsDir = buildDir + folderPath;
         }
         logger.info("Test results directory is: "+ testResultsDir);
     }
 
     /**
-     * Method will connect with sauceLabs and create virtual machine with specified parameters
+     * Creates connection to SauceLabs REST API
+     * and launches specified remote browser on the SauceLabs Service.
      */
     private void createSauceLabsSession() {
         DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -342,7 +384,6 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         capabilities.setCapability(CapabilityType.PLATFORM, sauceLabsParameters[0]);
         capabilities.setCapability("name", testName.getMethodName());
         driver = new RemoteWebDriver(getSauceLabsAPIAddress(), capabilities);
-        //sessionId = ((RemoteWebDriver)driver).getSessionId().toString();
     }
 
     /**
@@ -365,74 +406,84 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     }
 
     /**
-     * Method will open specified browser, which will be used to run test
+     * Open specified browser to run tests in.
+     * Browser selection based on {@link #browser} variable.
      */
     private void openChosenBrowser() {
-        if (browser.equals("CHROME")) {
-            //setChromeDriverSystemProperty(); //Locked to use WebDriver from system environment.
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--start-maximized"); // It has issues with resizing.
-            /* Chromedriver 2.10 starts with message:
-            "You are using an unsupported command-line flag: --ignore-certificate-errors. Stability and security will suffer."
-            More details by link: https://code.google.com/p/chromedriver/issues/detail?id=799 */
-            options.addArguments("test-type");
-            driver = new ChromeDriver(options);
-        } else if (browser.equals("FIREFOX")) {
-            driver = new FirefoxDriver();
-            driver.manage().window().maximize();
-        } else if (browser.equals("HTMLUNIT")) {//instantiate a headless driver with javascript enabled
-            driver = new HtmlUnitDriver();
-        } else if (browser.equals("HTMLUNITNOJS")) {//instantiate a headless driver with javascript disabled
-            driver = new HtmlUnitDriver(false);
-            //fix to remove odd warnings it log
-            java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.SEVERE);
-        } else if (browser.equals("INTERNETEXPLORER")) {//assume iedriverserver from http://code.google.com/p/selenium/downloads/list is in one above project directory (where pom.xml is)
-            System.setProperty("webdriver.ie.driver", "../IEDriverServer.exe");
-            driver = new InternetExplorerDriver();
-            //TODO: automate http auth enable depending on presence of credentials in URL. And restore settings after.
-            /*NOTE: To allow http auth:
-            Had to update add iexplore.exe and explorer.exe DWORD values to the following regedit location, and set their values to 0
-            HKEY_LOCAL_MACHINE\Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_HTTP_USERNAME_PASSWORD_DISABLE */
-            // driver.manage().window().maximize(); //maximize the browser window
-        } else {
-            fail("UNSUPPORTED BROWSER:" + browser + " VALID BROWSERS: FIREFOX, CHROME, INTERNETEXPLORER, HTMLUNIT, HTMLUNITNOJS");
-        }
+        switch (browser){
+            case BrowserType.FIREFOX:
+                launchFirefox();
+                break;
+            case BrowserType.HTMLUNIT:
+                launchHtmlUnit();
+                break;
+            case "ie": //try to refactor to BrowserType.IE
+                launchInternetExplorer();
+                break;
+            case BrowserType.CHROME:
+            default:
+                launchChrome();
+                break;
+       }
     }
 
     /**
-     * Additional headless client just for StatusCode validation before open any URL.
+     * Creates a Chrome driver with Maximized window and removed warning.
+     * ChromeDriver must be listed in "path" system environment
+     * https://sites.google.com/a/chromium.org/chromedriver/downloads
+     */
+    private void launchChrome() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--start-maximized"); // It has issues with resizing.
+        /* Chromedriver 2.10 starts with message:
+        "You are using an unsupported command-line flag: --ignore-certificate-errors. Stability and security will suffer."
+        More details by link: https://code.google.com/p/chromedriver/issues/detail?id=799 */
+        options.addArguments("test-type"); // Fix for warning above
+        driver = new ChromeDriver(options);
+    }
+
+    /**
+     * Creates a Firefox driver with Maximized window.
+     * FFDriver must be listed in "path" system environment
+     */
+    private void launchFirefox() {
+        driver = new FirefoxDriver();
+        driver.manage().window().maximize();
+    }
+
+    /**
+     * Creates a headless HTML Unit driver with javascript enabled or disabled
+     * based on {@link #enableJavascript}.
+     */
+    private void launchHtmlUnit() {
+        driver = new HtmlUnitDriver(enableJavascript);
+        //fix to remove odd warnings in log
+        java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.SEVERE);
+    }
+
+    /**
+     * Creates iedriverserver with Maximized window.
+     * One of http://code.google.com/p/selenium/downloads/list
+     * is in one above project directory (where build.gradle is)
+     */
+    //TODO: refactor to use system environment
+    private void launchInternetExplorer() {
+        System.setProperty("webdriver.ie.driver", "../IEDriverServer.exe");
+        driver = new InternetExplorerDriver();
+        //TODO: automate http auth enable depending on presence of credentials in URL. And restore settings after.
+        /*NOTE: To allow http auth:
+        Had to update add iexplore.exe and explorer.exe DWORD values to the following regedit location, and set their values to 0
+        HKEY_LOCAL_MACHINE\Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_HTTP_USERNAME_PASSWORD_DISABLE */
+        driver.manage().window().maximize(); //maximize the browser window
+    }
+
+    /**
+     * Additional headless client just for StatusCode validation
+     * before open any URL.
      */
     //TODO: implement initialization based on flag and StatusCode Verification based on htmlUnitClient presence
-    private void createHtmlUnitClient() {
+    private static void createHtmlUnitClient() {
         htmlUnitClient = new WebClient();
-    }
-
-    /**
-     * Method will set hardcoded path to chromedriver according to the system which used
-     */
-    private void setChromeDriverSystemProperty() {
-        Platform currentPlatform = Platform.getCurrent();
-        if(currentPlatform.is(WINDOWS)){
-            currentPlatform = Platform.WINDOWS; //hack to simplify win versions
-        }
-        switch (currentPlatform) {
-            //assume chromedriver from https://sites.google.com/a/chromium.org/chromedriver/downloads
-            // is one above project directory (where pom.xml is)
-            case WINDOWS:
-                System.setProperty("webdriver.chrome.driver", "C:\\selenium\\chromedriver.exe"); //FOR WINDOWS
-                break;
-            case WIN8_1:
-                System.setProperty("webdriver.chrome.driver", "C:\\selenium\\chromedriver.exe"); //FOR WINDOWS
-                break;
-            case MAC:
-                System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver"); //FOR MAC
-                break;
-            case UNIX:
-                System.setProperty("webdriver.chrome.driver", "../chromedriver"); //FOR UNIX
-                break;
-            default:
-                logger.error("CHROME IS UNSUPPORTED ON THIS OS:" + currentPlatform);
-        }
     }
 
     /**
@@ -441,6 +492,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     @After
     public void tearDown() {
         long endTime = System.currentTimeMillis();
+        //TODO: counter should be moved out to "new Stopwatch()" Rule.
         testCaseExecutionTime = endTime - testStartTime;
         logger.info("Finishing test.... " + testCaseName);
         if(htmlUnitClient != null) {
@@ -575,22 +627,19 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     }
 
     /**
-     * Set a 10-digit to sessionId for tracking test sessions.
+     * Parametrised setter.
+     *
+     * @param  value
+     *         String to set as {@link #sessionId}
      */
-    //TODO: Investigate current implementation and remove redundant code
-    public void setSessionId() {
-//        if (sessionId == null) {
-//            StringBuilder randomizedString = new StringBuilder();
-//            for (int i = 0; i < 10; i++) {
-//                Random randInt = new Random();
-//                randomizedString.append(randInt.nextInt(10)).toString();
-//            }
-//            sessionId = randomizedString.toString();
-//        }
-        sessionId = ((RemoteWebDriver)driver).getSessionId().toString();
+    public static void setSessionId(String value) {
+        sessionId = value;
         logger.info("sessionID is " + sessionId);
     }
 
+    /**
+     * @return  String current session ID
+     */
     @Override
     public String getSessionId() {
         return sessionId;
@@ -631,8 +680,47 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         return login.concat(dateTime.concat("@domain.com"));
     }
 
+    /**
+     * @return  {@link WebClient} instance or null if was not created
+     */
     public static WebClient getHtmlUnitClient(){
         return htmlUnitClient;
     }
 
+    /**
+     * Case insensitive {@link List#contains(Object)} implementation.
+     *
+     * @param   search
+     *          The {@code String} to compare against List items
+     * @param   list
+     *          The {@code List<String>} to be searched in
+     * @return  True if string was found in given array otherwise False
+     */
+    public static boolean isInArrayIgnoreCase(String search, List<String> list){
+        for (String string : list){
+            if (string.equalsIgnoreCase(search)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns a random integer in the range 0 to n-1 inclusive.
+     * The lowest possible value is 0 + 1000000000 = 1000000000
+     * The highest possible value is 9000000000-1 + 1000000000 = 9999999999
+     *
+     * @return  Generated number converted to <code>String</code>
+     */
+    public static String generate10DigitString() {
+        return String.valueOf((long) Math.floor(Math.random() * 9000000000L) + 1000000000L);
+    }
+
+    /**
+     * Set a 10-digit to sessionId for tracking test sessions.
+     */
+    //TODO: Investigate current implementation and remove redundant code
+    public static void setSessionId() {
+        setSessionId(generate10DigitString());
+    }
 }
