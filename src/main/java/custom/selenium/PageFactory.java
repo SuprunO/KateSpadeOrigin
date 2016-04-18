@@ -46,7 +46,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
@@ -59,16 +59,12 @@ import static org.junit.Assert.*;
  */
 public abstract class PageFactory {
 
-    //the main web driver
-    public static WebDriver driver;
-    private static WebClient htmlUnitClient = TestFactory.getHtmlUnitClient();
-
-    public static Logger logger = Logger.getLogger(PageFactory.class);
-    public static String startUrl = TestFactory.getStartURL();
+    protected static WebDriver driver;
+    private static final WebClient htmlUnitClient = TestFactory.getHtmlUnitClient();
+    private static final Logger logger = Logger.getLogger(PageFactory.class);
+    public static final String START_URL = TestFactory.getStartURL();
 
     public static final int DEFAULT_WAIT_TIME = 60; //default time to patiently wait for finding elements
-    public static final String PASS = "PASSED";
-
 
     /* Static Pages Paths */
     public static final String PAGE_ABOUT_US = "about.html";
@@ -303,13 +299,13 @@ public abstract class PageFactory {
      * * Method that selects all input fields and DropDowns from the specified ArrayList
      * using FillInTextInput() and SelectDropDownValue() methods.
      *
-     * @param fields ArrayList<Field> list with fields. Each field have type(String), locator(By) and value(String).
+     * @param fields List<Field> list with fields. Each field have type(String), locator(By) and value(String).
      */
-    public void fillFieldsSet(ArrayList<Field> fields) {
+    public void fillFieldsSet(List<Field> fields) {
         for (Field entry : fields) {
-            if ("input".equals(entry.getType())) {
+            if (entry.getType().equals(Field.INPUT)) {
                 fillInInput(entry.getLocator(), entry.getValue());
-            } else if ("dropdown".equals(entry.getType())) {
+            } else if (entry.getType().equals(Field.SELECT)) {
                 selectValueInDropDown(entry.getLocator(), entry.getValue());
             }
         }
@@ -402,10 +398,10 @@ public abstract class PageFactory {
      * @param pageName name of the page
      */
     public void openPage(String pagePath, String pageName) {
-        logger.info("Opening URL: " + startUrl + pagePath);
-        driver.get(startUrl + pagePath);
-        assertEquals(pageName + " WAS NOT OPENED!", startUrl + pagePath, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + startUrl + pagePath, is404Page());
+        logger.info("Opening URL: " + START_URL + pagePath);
+        driver.get(START_URL + pagePath);
+        assertEquals(pageName + " WAS NOT OPENED!", START_URL + pagePath, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + START_URL + pagePath, is404Page());
     }
 
     /**
@@ -414,7 +410,7 @@ public abstract class PageFactory {
      */
     public void logout() {
         logger.info("Making log out...");
-        driver.get(startUrl + "customer/account/logout/");
+        driver.get(START_URL + "customer/account/logout/");
     }
 
     /**
@@ -439,13 +435,11 @@ public abstract class PageFactory {
         alert.accept();
     }
 
-
     /**
-     * <p>Indicates that {@link TestFactory.htmlUnitClient } was created and passed to {@link htmlUnitClient}.</p>
+     * <p>Indicates that {@link TestFactory#htmlUnitClient } was created and passed to {@link #htmlUnitClient}.</p>
      *
      * @return true|false
      */
-    @SuppressWarnings("JavadocReference")
     private static boolean isHtmlUnitPresent() {
         return htmlUnitClient != null;
     }
@@ -471,12 +465,11 @@ public abstract class PageFactory {
             htmlUnitClient.throwFailingHttpStatusCodeExceptionIfNecessary(response);
             return response.getStatusCode();
         } catch (IOException ioe) {
-            fail(ioe.getMessage());
+            throw new TestFrameworkRuntimeException(ioe);
         }finally {
             long duration = System.currentTimeMillis() - start;
             logger.info("Validating statusCode for: " + url + " (done) | time=" + duration + "ms");
         }
-        return 0; //Unreachable, formally added
     }
 
 }

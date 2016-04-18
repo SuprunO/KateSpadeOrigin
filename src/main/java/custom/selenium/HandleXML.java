@@ -54,7 +54,7 @@ import java.io.IOException;
  * @author Speroteck QA Team (qa@speroteck.com)
  */
 public class HandleXML {
-    static final Logger logger = Logger.getLogger(TestFactory.class);
+    static final Logger logger = Logger.getLogger(HandleXML.class);
 
     private DocumentBuilder builder;
     private Document temporaryXML;

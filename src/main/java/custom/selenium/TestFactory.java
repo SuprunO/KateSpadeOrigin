@@ -76,6 +76,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
 
     public static final Logger logger = Logger.getLogger(TestFactory.class);
     private static final String SAUCE_LABS_URL_ENDING = "@ondemand.saucelabs.com:80/wd/hub";
+    private static final String BROWSER_TYPE_IE = "ie";
 
     protected static SauceOnDemandAuthentication authentication;
 
@@ -190,9 +191,9 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     /**
      * Static Field setter, to fix non-static access
      *
-     * @param value Current(executing) test name
+     * @param value  Current(executing) test name
+     * TODO: Investigate possible collisions on multi-tests runs. And multi-thread running.
      */
-    //TODO: Investigate possible collisions on multi-tests runs. And multi-thread running.
     private static void setTestCaseName(String value){
         testCaseName = value;
     }
@@ -206,6 +207,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         setLoggingLevel();
         logger.info("Load settings...");
         setBrowser();
+        setEnabledJavascript();
         setBaseUrls();
         setSSLProperty();
         setSauceLabsConfigs();
@@ -233,29 +235,31 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * @return List of Browser which could be launched by current Framework
      */
     private static List<String> getSupportedBrowsers(){
-//        Class c =  BrowserType.class;
-//        // выводим поля класса
-//        java.lang.reflect.Field[] fields = c.getDeclaredFields();
-//        for (java.lang.reflect.Field field : fields) {
-//            supportedBrowsers.add(field.getName());
-//        }
-        return Arrays.asList("FIREFOX", "CHROME", "IE", "HTMLUNIT", "HTMLUNITJS");
+        return Arrays.asList(BrowserType.FIREFOX, BrowserType.CHROME, BrowserType.HTMLUNIT, BROWSER_TYPE_IE);
     }
 
+    /**
+     * {@link #browser} filed setter. Sets browser form command line
+     * to one of accepted values: 'chrome' | 'firefox' | 'htmlunit' | 'ie'
+     * if browser not recognized it will be set to "chrome"
+     */
     private static void setBrowser() {
         String flag = System.getProperty("browser");
         List<String> supportedBrowsers = getSupportedBrowsers();
         if (flag != null && isInArrayIgnoreCase(flag, supportedBrowsers)){
-            if("HTMLUNITJS".equalsIgnoreCase(flag)){ //TODO: refactor to get rid of this exceptional check
-                enableJavascript = true;
-                flag = flag.replace("JS", "");
-            }
             browser = flag.toLowerCase();
             logger.info("Specified Browser is <" + flag + ">");
         } else {
             browser = BrowserType.CHROME;
             logger.warn("Browser is not specified. Using default: " + browser);
         }
+    }
+
+    /**
+     * Enables JS for HTMLUnit driver.
+     */
+    private static void setEnabledJavascript() {
+        enableJavascript = System.getProperty("enableJS") != null;
     }
 
     /**
@@ -417,7 +421,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
             case BrowserType.HTMLUNIT:
                 launchHtmlUnit();
                 break;
-            case "ie": //try to refactor to BrowserType.IE
+            case BROWSER_TYPE_IE:
                 launchInternetExplorer();
                 break;
             case BrowserType.CHROME:
@@ -459,6 +463,9 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         driver = new HtmlUnitDriver(enableJavascript);
         //fix to remove odd warnings in log
         java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.SEVERE);
+        if (!enableJavascript){
+            logger.warn("Note: HTML Unit launched with disabled JS by default");
+        }
     }
 
     /**
@@ -466,8 +473,8 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * One of http://code.google.com/p/selenium/downloads/list
      * is in one above project directory (where build.gradle is)
      */
-    //TODO: refactor to use system environment
     private void launchInternetExplorer() {
+        //TODO: refactor to use system environment
         System.setProperty("webdriver.ie.driver", "../IEDriverServer.exe");
         driver = new InternetExplorerDriver();
         //TODO: automate http auth enable depending on presence of credentials in URL. And restore settings after.
@@ -481,8 +488,8 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * Additional headless client just for StatusCode validation
      * before open any URL.
      */
-    //TODO: implement initialization based on flag and StatusCode Verification based on htmlUnitClient presence
     private static void createHtmlUnitClient() {
+        //TODO: implement initialization based on flag and StatusCode Verification based on htmlUnitClient presence
         htmlUnitClient = new WebClient();
     }
 
@@ -492,8 +499,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     @After
     public void tearDown() {
         long endTime = System.currentTimeMillis();
-        //TODO: counter should be moved out to "new Stopwatch()" Rule.
-        testCaseExecutionTime = endTime - testStartTime;
+        setTestCaseExecutionTime(endTime - testStartTime); //TODO: counter should be moved out to "new Stopwatch()" Rule.
         logger.info("Finishing test.... " + testCaseName);
         if(htmlUnitClient != null) {
             htmlUnitClient.close();
@@ -624,6 +630,16 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         testResultXML.appendChildNodeWithText("test", "duration", String.valueOf(testCaseExecutionTime));
         testResultXML.appendChildNodeWithText("test", "stdout", testOutput);
         testResultXML.writeXMLtoFile(testResultsDir + testCaseName + String.valueOf(new Date().getTime()));
+    }
+
+    /**
+     * Parametrised setter.
+     *
+     * @param  value
+     *         long number to set as {@link #testCaseExecutionTime}
+     */
+    public static void setTestCaseExecutionTime(long value) {
+        testCaseExecutionTime = value;
     }
 
     /**

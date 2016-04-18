@@ -37,7 +37,8 @@ FAQ:
     *  or create a ~/.sauce-ondemand properties-file with "username" and "key" properties
 * **Available parameters:**
     * -Dbrowser specifies the browser that will be lunched to execute tests.  
-        Values:  CHROME(default) | FIREFOX | IE | HTMLUNIT | HTMLUNITJS
+        Values:  chrome(default) | firefox | ie | htmlunit
+        Note: -DenableJS should be addaed to enable JS for HTML Unit Driver
     * -DbaseUrl  specifies target site for testing ex.: http://mysite.com 
     * -DsslEnabled  specifies usage of "https://" for current site
     yes  (if omitted or any other value is specified - "no" will be applied) 

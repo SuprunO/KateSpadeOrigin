@@ -42,6 +42,9 @@ import org.openqa.selenium.By;
  * @author Speroteck QA Team (qa@speroteck.com)
  */
 public class Field {
+    public static final String INPUT = "input";
+    public static final String SELECT = "dropdown";
+
     private By locator;
     private String value;
     private String type;

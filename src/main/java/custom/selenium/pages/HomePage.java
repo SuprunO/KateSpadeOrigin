@@ -52,7 +52,7 @@ import static org.junit.Assert.*;
  */
 public class HomePage extends PageFactory {
 
-    public Logger logger = Logger.getLogger(TestFactory.class);
+    private static final Logger logger = Logger.getLogger(TestFactory.class);
 
     /* Home Page elements */
     public static final String PATH_TO_BESTSELLERS_LIST = "//ul[contains(@class,'products-grid')]";
@@ -78,7 +78,7 @@ public class HomePage extends PageFactory {
      * @return List of Strings
      */
     public List<String> getListOfBestsellersNames() {
-        List<String> inStockNames = new ArrayList<String>();
+        List<String> inStockNames = new ArrayList<>();
         assertTrue("NO PRODUCTS GRID AVAILABLE.", isElementPresent(By.xpath(PATH_TO_BESTSELLERS_LIST)));
         for (WebElement link : driver.findElements(By.xpath(PATH_TO_BESTSELLERS_LIST +
                 "/li/div/a"))) {

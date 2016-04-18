@@ -40,6 +40,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static custom.selenium.TestFactory.getStartURL;
 import static org.junit.Assert.*;
@@ -52,7 +53,7 @@ import static org.junit.Assert.*;
  */
 public class LoginSignUpPage extends PageFactory {
 
-    public Logger logger = Logger.getLogger(TestFactory.class);
+    private static final Logger logger = Logger.getLogger(LoginSignUpPage.class);
 
     /* Facebook locators */
     public static final By FIELD_EMAIL_FACEBOOK = By.id("email");
@@ -125,14 +126,14 @@ public class LoginSignUpPage extends PageFactory {
         open();
 
         /* List of input fields which needed to be filled in. */
-        ArrayList<Field> inputsList = new ArrayList<Field>();
+        List<Field> inputsList = new ArrayList<>();
 
         /* type of input(String), key is input field locator(class By) , value is String filling in this input */
-        inputsList.add(new Field("input", FIELD_SIGN_UP_FIRST_NAME, TEST_FIRST_NAME));
-        inputsList.add(new Field("input", FIELD_SIGN_UP_LAST_NAME, TEST_LAST_NAME));
-        inputsList.add(new Field("input", FIELD_SIGN_UP_EMAIL, email));
-        inputsList.add(new Field("input", FIELD_SIGN_UP_PASSWORD, pass));
-        inputsList.add(new Field("input", FIELD_SIGN_UP_CONFIRM_PASSWORD, pass));
+        inputsList.add(new Field(Field.INPUT, FIELD_SIGN_UP_FIRST_NAME, TEST_FIRST_NAME));
+        inputsList.add(new Field(Field.INPUT, FIELD_SIGN_UP_LAST_NAME, TEST_LAST_NAME));
+        inputsList.add(new Field(Field.INPUT, FIELD_SIGN_UP_EMAIL, email));
+        inputsList.add(new Field(Field.INPUT, FIELD_SIGN_UP_PASSWORD, pass));
+        inputsList.add(new Field(Field.INPUT, FIELD_SIGN_UP_CONFIRM_PASSWORD, pass));
 
         /* Filling in input fields which are present in inputsList. */
         fillFieldsSet(inputsList);

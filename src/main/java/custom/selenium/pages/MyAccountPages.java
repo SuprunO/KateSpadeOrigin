@@ -34,7 +34,7 @@ package custom.selenium.pages;
 
 import custom.selenium.Field;
 import custom.selenium.PageFactory;
-import custom.selenium.TestFactory;
+import custom.selenium.TestFrameworkRuntimeException;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -42,7 +42,6 @@ import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static custom.selenium.TestFactory.getStartURL;
 import static junit.framework.Assert.assertEquals;
@@ -56,7 +55,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class MyAccountPages extends PageFactory{
 
-    public Logger logger = Logger.getLogger(TestFactory.class);
+    private static final Logger logger = Logger.getLogger(MyAccountPages.class);
 
     public static final String PAGE_REGISTRATION_SUCCESS = "/account/index/";
     public static final By SUCCESS_MESSAGE = By.xpath("//li[@class='success-msg']");
@@ -216,16 +215,6 @@ public class MyAccountPages extends PageFactory{
     }
 
     /**
-     * This method will open My Account page, My account information section.
-     */
-    public void openMyJulesRewardsPage() {
-        logger.info("Opening URL: " + getStartURL() + PAGE_MY_JULES_REWARDS_PAGE);
-        driver.get(getStartURL() + PAGE_MY_JULES_REWARDS_PAGE);
-        assertEquals("MY ACCOUNT PAGE WAS NOT OPENED!", getStartURL() + PAGE_MY_JULES_REWARDS_PAGE, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_MY_JULES_REWARDS_PAGE, is404Page());
-    }
-
-    /**
      * This method will open My Account page, Order History section.
      */
     public void openOrderHistory() {
@@ -287,19 +276,19 @@ public class MyAccountPages extends PageFactory{
                 /* List of input fields and DropDowns which needed to be filled in. */
         ArrayList<Field> myAccNewCardFields = new ArrayList<Field>();
                 /* type, key is input field locator(class By) , value is String filling in this input */
-        myAccNewCardFields.add(new Field("dropdown", ADD_CARD_DROPDOWN_CREDIT_CARD_TYPE, TEST_CARD_TYPE));
-        myAccNewCardFields.add(new Field("input", ADD_CARD_FIELD_CREDIT_CARD_NUMBER, TEST_CARD_NUMBER));
-        myAccNewCardFields.add(new Field("dropdown", ADD_CARD_DROPDOWN_EXPIRATION_MONTH, TEST_CARD_MONTH));
-        myAccNewCardFields.add(new Field("dropdown", ADD_CARD_DROPDOWN_EXPIRATION_YEAR, TEST_CARD_YEAR));
-        myAccNewCardFields.add(new Field("input", ADD_CARD_FIELD_BILLING_FIRST_NAME, TEST_FIRST_NAME));
-        myAccNewCardFields.add(new Field("input", ADD_CARD_FIELD_BILLING_LAST_NAME, TEST_LAST_NAME));
-        myAccNewCardFields.add(new Field("input", ADD_CARD_FIELD_BILLING_STREET_ADDRESS1, WA_GUEST_STREET_1));
-        myAccNewCardFields.add(new Field("input", ADD_CARD_FIELD_BILLING_STREET_ADDRESS2, WA_GUEST_STREET_2));
-        myAccNewCardFields.add(new Field("input", ADD_CARD_FIELD_BILLING_CITY, WA_GUEST_CITY));
-        myAccNewCardFields.add(new Field("dropdown", ADD_CARD_FIELD_BILLING_STATE, WA_GUEST_STATE));
-        myAccNewCardFields.add(new Field("input", ADD_CARD_FIELD_BILLING_ZIP, WA_GUEST_ZIP));
-        myAccNewCardFields.add(new Field("dropdown", ADD_CARD_FIELD_BILLING_COUNTRY, WA_GUEST_COUNTRY));
-        myAccNewCardFields.add(new Field("input", ADD_CARD_FIELD_BILLING_TELEPHONE, WA_GUEST_PHONE));
+        myAccNewCardFields.add(new Field(Field.SELECT, ADD_CARD_DROPDOWN_CREDIT_CARD_TYPE, TEST_CARD_TYPE));
+        myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_FIELD_CREDIT_CARD_NUMBER, TEST_CARD_NUMBER));
+        myAccNewCardFields.add(new Field(Field.SELECT, ADD_CARD_DROPDOWN_EXPIRATION_MONTH, TEST_CARD_MONTH));
+        myAccNewCardFields.add(new Field(Field.SELECT, ADD_CARD_DROPDOWN_EXPIRATION_YEAR, TEST_CARD_YEAR));
+        myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_FIELD_BILLING_FIRST_NAME, TEST_FIRST_NAME));
+        myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_FIELD_BILLING_LAST_NAME, TEST_LAST_NAME));
+        myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_FIELD_BILLING_STREET_ADDRESS1, WA_GUEST_STREET_1));
+        myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_FIELD_BILLING_STREET_ADDRESS2, WA_GUEST_STREET_2));
+        myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_FIELD_BILLING_CITY, WA_GUEST_CITY));
+        myAccNewCardFields.add(new Field(Field.SELECT, ADD_CARD_FIELD_BILLING_STATE, WA_GUEST_STATE));
+        myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_FIELD_BILLING_ZIP, WA_GUEST_ZIP));
+        myAccNewCardFields.add(new Field(Field.SELECT, ADD_CARD_FIELD_BILLING_COUNTRY, WA_GUEST_COUNTRY));
+        myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_FIELD_BILLING_TELEPHONE, WA_GUEST_PHONE));
         // fill all fields and dropdowns
         fillFieldsSet(myAccNewCardFields);
         clickOnElement(ADD_CARD_BUTTON_ADD_NEW_CARD, "Button: Add New Card");
@@ -319,15 +308,15 @@ public class MyAccountPages extends PageFactory{
                 /* List of input fields which needed to be filled in. */
         ArrayList<Field> myAccUpdateShippingInputs = new ArrayList<Field>();
                 /* type, key is input field locator(class By) , value is String filling in this input */
-        myAccUpdateShippingInputs.add(new Field("input", MY_ACC_SHIPPING_FIELD_FIRST_NAME, TEST_FIRST_NAME));
-        myAccUpdateShippingInputs.add(new Field("input", MY_ACC_SHIPPING_FIELD_LAST_NAME, TEST_LAST_NAME));
-        myAccUpdateShippingInputs.add(new Field("input", MY_ACC_SHIPPING_FIELD_TELEPHONE, WA_GUEST_PHONE));
-        myAccUpdateShippingInputs.add(new Field("input", MY_ACC_SHIPPING_FIELD_STREET_ADDRESS_1, WA_GUEST_STREET_1));
-        myAccUpdateShippingInputs.add(new Field("input", MY_ACC_SHIPPING_FIELD_STREET_ADDRESS_2, WA_GUEST_STREET_2));
-        myAccUpdateShippingInputs.add(new Field("input", MY_ACC_SHIPPING_FIELD_CITY, WA_GUEST_CITY));
-        myAccUpdateShippingInputs.add(new Field("dropdown", MY_ACC_SHIPPING_DROPDOWN_STATE, WA_GUEST_STATE));
-        myAccUpdateShippingInputs.add(new Field("input", MY_ACC_SHIPPING_FIELD_ZIP, WA_GUEST_ZIP));
-        myAccUpdateShippingInputs.add(new Field("dropdown", MY_ACC_SHIPPING_DROPDOWN_COUNTRY, WA_GUEST_COUNTRY));
+        myAccUpdateShippingInputs.add(new Field(Field.INPUT, MY_ACC_SHIPPING_FIELD_FIRST_NAME, TEST_FIRST_NAME));
+        myAccUpdateShippingInputs.add(new Field(Field.INPUT, MY_ACC_SHIPPING_FIELD_LAST_NAME, TEST_LAST_NAME));
+        myAccUpdateShippingInputs.add(new Field(Field.INPUT, MY_ACC_SHIPPING_FIELD_TELEPHONE, WA_GUEST_PHONE));
+        myAccUpdateShippingInputs.add(new Field(Field.INPUT, MY_ACC_SHIPPING_FIELD_STREET_ADDRESS_1, WA_GUEST_STREET_1));
+        myAccUpdateShippingInputs.add(new Field(Field.INPUT, MY_ACC_SHIPPING_FIELD_STREET_ADDRESS_2, WA_GUEST_STREET_2));
+        myAccUpdateShippingInputs.add(new Field(Field.INPUT, MY_ACC_SHIPPING_FIELD_CITY, WA_GUEST_CITY));
+        myAccUpdateShippingInputs.add(new Field(Field.SELECT, MY_ACC_SHIPPING_DROPDOWN_STATE, WA_GUEST_STATE));
+        myAccUpdateShippingInputs.add(new Field(Field.INPUT, MY_ACC_SHIPPING_FIELD_ZIP, WA_GUEST_ZIP));
+        myAccUpdateShippingInputs.add(new Field(Field.SELECT, MY_ACC_SHIPPING_DROPDOWN_COUNTRY, WA_GUEST_COUNTRY));
         // fill all fields and dropdowns
         fillFieldsSet(myAccUpdateShippingInputs);
         // save
@@ -344,12 +333,12 @@ public class MyAccountPages extends PageFactory{
      *
      * @return Object[5]: String "Order #", String "Date", String "Ship To", String "Total", String "Order Details URL"
      */
-    public ArrayList<String> getLastOrderFromOrderHistoryTable() {
+    public List<String> getLastOrderFromOrderHistoryTable() {
         List<WebElement> myOrdersList = driver.findElements(By.xpath(MY_ORDERS_TABLE_LINES_LOCATOR));
-        assertTrue("NO ORDERS FOUND IN ODER HISTORY TABLE!", myOrdersList.size() > 0);
+        assertFalse("NO ORDERS FOUND IN ODER HISTORY TABLE!", myOrdersList.isEmpty());
         logger.info("Got last order, extracting details...");
         List<WebElement> lastOrderDetails = driver.findElements(By.xpath(MY_ORDERS_TABLE_LINES_LOCATOR + "/td"));
-        ArrayList<String> orderDetails = new ArrayList<String>();
+        ArrayList<String> orderDetails = new ArrayList<>();
         orderDetails.add(lastOrderDetails.get(0).getText());
         orderDetails.add(lastOrderDetails.get(1).getText());
         orderDetails.add(lastOrderDetails.get(2).getText());
@@ -386,12 +375,12 @@ public class MyAccountPages extends PageFactory{
     /**
      * This method will open My Account page, Order Details page for first Order in the list.
      */
-    public void openOrderStatusPage() throws Exception {
+    public void openOrderStatusPage() {
         openOrderHistoryPage();
         if (isElementPresent(LINK_ORDER_VIEW_FIRST)) {
             driver.findElement(LINK_ORDER_VIEW_FIRST).click();
         } else {
-            throw new Exception("COULD NOT FIND ELEMENT: LINK ORDER VIEW");
+            throw new TestFrameworkRuntimeException("COULD NOT FIND ELEMENT: LINK ORDER VIEW");
         }
     }
 
@@ -418,23 +407,23 @@ public class MyAccountPages extends PageFactory{
     /**
      * This method will open My Account page, My Wishlist section.
      */
-    public void clickButtonShareWishlist() throws Exception {
+    public void clickButtonShareWishlist() {
         if (isElementPresent(BUTTON_SHARE_WISHLIST)) {
             driver.findElement(BUTTON_SHARE_WISHLIST).click();
         } else {
-            throw new Exception("COULD NOT FIND ELEMENT: BUTTON SHARE WISHLIST");
+            throw new TestFrameworkRuntimeException("COULD NOT FIND ELEMENT: BUTTON SHARE WISHLIST");
         }
     }
 
     /**
      * This method will open My Account page, Edi Credit Card section.
      */
-    public void openEditCardSection() throws Exception {
+    public void openEditCardSection() {
         openBillingInformationSection();
         if (isElementPresent(BILLING_INFO_BUTTON_EDIT_CARD)) {
             driver.findElement(BILLING_INFO_BUTTON_EDIT_CARD).click();
         } else {
-            throw new Exception("COULD NOT FIND ELEMENT: EDIT CARD BUTTON");
+            throw new TestFrameworkRuntimeException("COULD NOT FIND ELEMENT: EDIT CARD BUTTON");
         }
     }
 
@@ -452,131 +441,13 @@ public class MyAccountPages extends PageFactory{
     /**
      * This method will open My Account page, Update Address section.
      */
-    public void openUpdateAddressSection() throws Exception {
+    public void openUpdateAddressSection() {
         open();
         if (isElementPresent(LINK_UPDATE_ADDRESS)) {
             driver.findElement(LINK_UPDATE_ADDRESS).click();
         } else {
-            throw new Exception("COULD NOT FIND ELEMENT: LINK FOR UPDATE AN ADDRESS");
+            throw new TestFrameworkRuntimeException("COULD NOT FIND ELEMENT: LINK FOR UPDATE AN ADDRESS");
         }
     }
 
-    /**
-     * Use this method to check if user become a maven
-     * @return boolean
-     */
-    public boolean isMavenWindowVisible() {
-        assertTrue("MAVEN WINDOW WAS NOT FOUND", isElementPresent(MAVEN_WINDOW));
-        return driver.findElement(MAVEN_WINDOW).isDisplayed();
-    }
-
-    /**
-     * Use this method to swap out all products from the box on Edit Box page
-     */
-    public void swapOutAllProducts() {
-        while (!driver.findElements(BUTTON_SWAP_OUT).isEmpty()){
-            clickOnElement(BUTTON_SWAP_OUT, "Button 'Swap Out'");
-            sleep(1000);
-        }
-    }
-    /**
-     * Use this method to swap in randomly products to the box on Edit Box page
-     * @return List<String> of swapped in product skus
-     */
-    public List<String> swapInProducts() {
-        List<String> swappedInProductsSku = new ArrayList<String>();
-        while (driver.findElement(By.xpath(ITEM_SWAP_IN)).isDisplayed()){
-            int swapInQty = driver.findElements(By.xpath(ITEM_SWAP_IN)).size();
-            Random randomGen = new Random();
-            int rndNum = randomGen.nextInt(swapInQty);
-            swappedInProductsSku.add(driver.findElement(By.xpath(ITEM_SWAP_IN + "[" + rndNum + "]")).getAttribute("data-product-sku"));
-            waitForElementIsVisible(By.xpath(ITEM_SWAP_IN + "[" + rndNum + "]//a[@class='button new-style-button']"));
-            clickOnElement(By.xpath(ITEM_SWAP_IN + "[" + rndNum + "]//a[@class='button new-style-button']"), "Button 'Swap In'");
-            sleep(1000);
-        }
-        return swappedInProductsSku;
-    }
-
-    /**
-     * Use this method to get list of skus currently swapped in on Edit box page
-     * @return List<String> of swapped in product skus
-     */
-    public List<String> getCurrentSwappedProducts() {
-        List<WebElement> swappedProductsList = driver.findElements(ITEM_SWAP_OUT);
-        List<String> swappedInProductsSku = new ArrayList<String>();
-        for(WebElement item: swappedProductsList){
-            swappedInProductsSku.add(item.getAttribute("data-product-sku"));
-        }
-        return swappedInProductsSku;
-    }
-
-    /**
-     * This method gets a list of current add ons
-     * @return List of Strings
-     */
-    public List<String> getCurrentAddonsList() {
-        List<WebElement> productsList = driver.findElements(PRODUCT_GRID_ADDONS);
-        List<String> currentAddonsList = new ArrayList<String>();
-        for (WebElement item : productsList) {
-            currentAddonsList.add(item.getAttribute("data-product-sku"));
-        }
-        return currentAddonsList;
-    }
-
-    /**
-     * This method removes selected add ons from My Account > Edit My Box page
-     * @param listOfProducts String[]
-     */
-    public void removeCurrentAddons(List<String> listOfProducts) {
-        for (String item : listOfProducts) {
-            waitForElementIsVisible(By.xpath("//li[@data-product-sku='" + item +
-                    "']//a[@title='Remove']"));
-            clickOnElement(By.xpath("//li[@data-product-sku='" + item +
-                    "']//a[@title='Remove']"), "'Remove' link of product with SKU: " + item);
-        }
-        //make sure there are no selected add ons left
-        assertTrue("HERE IS SELECTED PRODUCTS", driver.findElements(LINK_REMOVE_ADDONS).size() < 1);
-    }
-
-    /**
-     * This method selecting random add ons
-     * @return list of Strings
-     */
-    public List<String> selectNewAddOns() {
-        List<String> listOfSelectedProducts = new ArrayList<String>();
-        //make sure there are products in stock
-        List<String> listOfInStockAddons = getListOfInStockProductSKUs();
-        assertTrue("THERE ARE NO IN STOCK PRODUCTS FOUND", listOfInStockAddons.size() > 0);
-        //pick a random product
-        Random randomGenerator = new Random();
-        String addonSKU;
-        int addonNumber;
-        while (!driver.findElement(SELECTED_COUNT).getText().equals(MAXIMUM_ADDONS)) {
-            addonNumber = randomGenerator.nextInt(listOfInStockAddons.size());
-            addonSKU = listOfInStockAddons.get(addonNumber);
-            clickOnElement(By.xpath("//li[@data-product-sku='" + addonSKU + "']//a[@title='Select']"), "'Select' button for product with SKU " + addonSKU);
-            listOfSelectedProducts.add(addonSKU);
-        }
-        return listOfSelectedProducts;
-    }
-
-    /**
-     * This method gets a list of in stock add ons
-     * @return List
-     */
-    public List<String> getListOfInStockProductSKUs() {
-        List<String> inStockSKUs = new ArrayList<String>();
-        assertTrue("NO PRODUCTS GRID AVAILABLE!", isElementPresent(GRID_MAVEN_ADDONS));
-        for (WebElement link : driver.findElements(GRID_ADDONS_IN_STOCK)) {
-            inStockSKUs.add(link.getAttribute("data-product-sku"));
-        }
-        return inStockSKUs;
-    }
-
-    public void upgradeMavenAccount(String suscription, int i) {
-        clickOnElement(UPGRADE_BANNER, "Banner Upgrade Maven");
-        waitForElementIsVisible(By.xpath("//button[@id='" + suscription + "-" + i + "']"));
-        clickOnElement(By.xpath("//button[@id='" + suscription + "-" + i + "']"),"Click button get " + suscription + " " + i + " month" );
-        waitForElementIsVisible(BLOCK_SUCCESS_MSG);
-    }
 }

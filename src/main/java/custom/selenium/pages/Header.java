@@ -33,7 +33,6 @@
 package custom.selenium.pages;
 
 import custom.selenium.PageFactory;
-import custom.selenium.TestFactory;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -50,7 +49,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class Header extends PageFactory {
 
-    public Logger logger = Logger.getLogger(TestFactory.class);
+    private static final Logger logger = Logger.getLogger(Header.class);
 
     /* Header Elements */
     public static final By FIELD_SEARCH = By.id("search");
@@ -71,10 +70,10 @@ public class Header extends PageFactory {
      * Method enters specified text into the search field in the header and press ENTER key to run search
      */
     public void searchByText(String searchPhrase) {
-        System.out.print("Entering text: " + searchPhrase + "into search field in header");
+        logger.info("Entering text: " + searchPhrase + "into search field in header");
         driver.findElement(FIELD_SEARCH).sendKeys(searchPhrase);
         Actions action = new Actions(driver);
-        System.out.print("Running search by pressing ENTER button");
+        logger.info("Running search by pressing ENTER button");
         action.sendKeys(Keys.ENTER).build().perform();
     }
 
