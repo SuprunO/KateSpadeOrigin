@@ -10,3 +10,7 @@ target/*
 *.json
 *.iml
 chromedriver.log
+
+lastrun.dat
+sauce_last_run.dat
+*.html
