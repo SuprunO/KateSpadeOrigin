@@ -30,60 +30,50 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package custom.selenium.pages;
 
-import custom.selenium.PageFactory;
-import custom.selenium.TestFactory;
+package lcg.selenium.pages;
+
+import lcg.selenium.Field;
+import lcg.selenium.PageFactory;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static custom.selenium.TestFactory.getStartURL;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 
 /**
- * A class, which contains implemented actions and verifications, which can be performed on Home page
+ * A class, which contains implemented actions and verifications, which can be performed on Checkout page
  *
  * @author Speroteck QA Team (qa@speroteck.com)
  */
-public class HomePage extends PageFactory {
+public class CheckoutSuccessPage extends PageFactory {
 
-    private static final Logger logger = Logger.getLogger(TestFactory.class);
+    public Logger logger = Logger.getLogger(CheckoutSuccessPage.class);
 
-    /* Home Page elements */
-    public static final String PATH_TO_BESTSELLERS_LIST = "//ul[contains(@class,'products-grid')]";
+    /* Order Summary Block */
+    public static final String PAGE_ORDER_SUCCESS = "ODe";
 
-    public HomePage(WebDriver driver) {
+
+    public CheckoutSuccessPage(WebDriver driver) {
         super(driver);
     }
 
     /**
-     * Opens Home Page entering url into the address field.
+     * Verifies that current page is Order Success Page and returns "true" if so.
+     *
+     * @return Bool
      */
-    public void open() {
-        logger.info(getStartURL() + " Status Code is " + getStatusCode(getStartURL()));
-        logger.info("Opening URL: " + getStartURL());
-        driver.get(getStartURL());
-        assertEquals("HOME PAGE WAS NOT OPENED", getStartURL(), driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL(), is404Page());
+    public boolean isOpened() {
+        return driver.getCurrentUrl().equals(getSecureBaseURL() + PAGE_ORDER_SUCCESS);
     }
 
-    /**
-     * Extracts products' names of "In Stock" product from current page and put it to List for further usage.
-     *
-     * @return List of Strings
-     */
-    public List<String> getListOfBestsellersNames() {
-        List<String> inStockNames = new ArrayList<>();
-        assertTrue("NO PRODUCTS GRID AVAILABLE.", isElementPresent(By.xpath(PATH_TO_BESTSELLERS_LIST)));
-        for (WebElement link : driver.findElements(By.xpath(PATH_TO_BESTSELLERS_LIST +
-                "/li/div/a"))) {
-            inStockNames.add(link.getAttribute("title"));
-        }
-        return inStockNames;
-    }
+
 }

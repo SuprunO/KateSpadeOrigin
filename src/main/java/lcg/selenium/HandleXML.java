@@ -30,7 +30,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package custom.selenium;
+package lcg.selenium;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;

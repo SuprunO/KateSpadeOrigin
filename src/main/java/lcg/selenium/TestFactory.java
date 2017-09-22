@@ -30,14 +30,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package custom.selenium;
+package lcg.selenium;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.saucelabs.common.SauceOnDemandAuthentication;
 import com.saucelabs.common.SauceOnDemandSessionIdProvider;
 import com.saucelabs.junit.SauceOnDemandTestWatcher;
 import com.thoughtworks.selenium.SeleniumLogLevels;
-import custom.selenium.pages.*;
+import lcg.selenium.pages.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;

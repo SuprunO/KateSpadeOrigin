@@ -30,11 +30,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package custom.selenium.pages;
+package lcg.selenium.pages;
 
-import custom.selenium.Field;
-import custom.selenium.PageFactory;
-import custom.selenium.TestFactory;
+import lcg.selenium.Field;
+import lcg.selenium.PageFactory;
+import lcg.selenium.TestFactory;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -42,7 +42,7 @@ import org.openqa.selenium.WebDriver;
 import java.util.ArrayList;
 import java.util.List;
 
-import static custom.selenium.TestFactory.getStartURL;
+import static lcg.selenium.TestFactory.getStartURL;
 import static org.junit.Assert.*;
 
 

@@ -30,11 +30,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package custom.selenium;
+package lcg.selenium;
 
 
 import com.gargoylesoftware.htmlunit.*;
-import custom.selenium.pages.Header;
+import lcg.selenium.pages.Header;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;

@@ -30,7 +30,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package custom.selenium;
+package lcg.selenium;
 
 /**
  * This class is used any time the Framework work needs to be interrupted
