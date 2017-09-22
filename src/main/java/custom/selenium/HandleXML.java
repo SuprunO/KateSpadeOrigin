@@ -273,7 +273,7 @@ public class HandleXML {
      *
      * @return  File path with added ".xml" if "." was not present
      */
-    private static String addXMLFileType(String fileName){
+    private static String addXMLFileTypeTo(String fileName){
         if(!isFileTypePresent(fileName)){
             return fileName + FILE_TYPE_XML;
         } else {
@@ -298,7 +298,7 @@ public class HandleXML {
      */
     public void writeXMLtoFile(String filePath) {
         long start = System.currentTimeMillis();
-        String normalizedPath = addXMLFileType(filePath);
+        String normalizedPath = addXMLFileTypeTo(filePath);
         try {
             DOMSource source = new DOMSource(temporaryXML);
             logger.info("Logging to file: " + normalizedPath);
