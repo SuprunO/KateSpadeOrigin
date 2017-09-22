@@ -59,34 +59,29 @@ public class CheckoutAsGuest extends TestFactory {
         log("Starting test: Guest Visitors have ability to place order");
         log("Test description: ");
         log("@Given: I am on \"Shopping Bag\" page as Guest with random product in cart.");
-        log("@When: I click \"Edit\" customer button");
-        log("@Then: I see Customer account info looks good in admin panel.");
+        log("@When: I go to Checkout as Guest");
+        log("@Then: I can fill all correct information and place order.");
         log("Stating step: ");
-        log("@Given: I am  on \"Manage Customers\" tab in \"Customers\" Admin Panel's Section and just after my order is placed.");
-        categoryLandingPage().open(CategoryLandingPage.PAGE_NAIL_POLISH);
-        categoryLandingPage().addToCartByProductName("Alice");
+        log("@Given: I am on \"Shopping Bag\" page as Guest with random product in cart.");
+        homePage().open();
+        productDetailsPage().openById("PXRU6931");
+        productDetailsPage().clickButtonAddToCart();
         header().clickOnCartIcon();
-        shoppingCartPage().clickCheckoutButton();
-        checkoutPage().fillShippingAddressForm("WASHINGTON");
-        checkoutPage().checkCheckboxBillingSameAsShipping();
-        checkoutPage().fillBillingCCForm();
-        checkoutPage().fillCreateAccountForm(testEmail, checkoutPage().CUSTOMER_PASSWORD);
-        checkoutPage().clickPlaceOrderButton();
-        checkoutPage().waitForOrderIsPlaced();
         log("@Given step: PASSED!");
         log("Stating step: ");
-        log("@Then: I see, the customer with email: '" + testEmail + "' in the list of customers.");
-
-        log("@Then step: PASSED!");
-
-        log("Stating step: ");
-        log("@When: I click \"Edit\" customer button");
-
-
+        log("@When: I go to Checkout as Guest");
+        shoppingCartPage().clickCheckoutButton();
+        checkoutLoginPage().clickButtonContinueAsGuest();
         log("@When step: PASSED!");
         log("Stating step: ");
-        log("@Then: I see Customer account info looks good in admin panel.");
-
+        log("@Then: I can fill all correct information and place order.");
+        checkoutShippingPage().fillShippingAddressForm("WASHINGTON");
+        checkoutShippingPage().checkCheckboxBillingSameAsShipping();
+        checkoutBillingPage().fillBillingCCForm();
+//TODO:        checkoutBillingPage().clickButtonContinue();
+        checkoutOrderReviewPage().clickPlaceOrderButton();
+        checkoutOrderReviewPage().waitForOrderIsPlaced();
+        assertTrue(checkoutSuccessPage().isOpened());
         log("@Then step: PASSED!");
     }
 }

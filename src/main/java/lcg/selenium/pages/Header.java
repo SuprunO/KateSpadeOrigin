@@ -52,10 +52,12 @@ public class Header extends PageFactory {
     private static final Logger logger = Logger.getLogger(Header.class);
 
     /* Header Elements */
+    public static final By LOGO = By.xpath("//a[@class='logo']");
     public static final By FIELD_SEARCH = By.id("search");
     public static final By ICON_SHOPPING_CART = By.id("quick-access-cart-icon");
     public static final By QUICK_ACCESS_ACCOUNT = By.id("quick-access-account");
-    public static final By LOGO = By.xpath("//a[@class='logo']");
+
+    public static final By POPUP_MINICART = By.xpath("//div[@class='mini-cart-content']");
 
     /* Header: Top Navigation Menu */
     public static final By TOP_NAV_MENU_SHOP = By.xpath("//ul[@id='nav']/li/a/span[contains(text(),'Shop')]");

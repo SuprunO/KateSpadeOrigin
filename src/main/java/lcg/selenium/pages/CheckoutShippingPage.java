@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static lcg.selenium.TestFactory.getStartURL;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
@@ -58,7 +59,7 @@ public class CheckoutShippingPage extends PageFactory {
 
     public Logger logger = Logger.getLogger(CheckoutShippingPage.class);
 
-    public static final String PAGE_ONEPAGE_CHECKOUT = "checkout/onepage/";
+    public static final String PAGE_CHECKOUT = "checkout/onepage/";
     public static final By WELCOME_ELEMENT = By.id("customer-welcome");
     public static final By BUTTON_PLACE_ORDER_DISABLED = By.xpath("//button[@class='btn-cart btn-checkout pink-button disabled']");
     public static final By BUTTON_PLACE_ORDER = By.xpath("//button[@class='btn-cart btn-checkout pink-button']");
@@ -144,7 +145,7 @@ public class CheckoutShippingPage extends PageFactory {
     */
     private final static String[] COUNTRY_LIST = new String[]{"Canada", "United States", "U.S. Minor Outlying Islands", "U.S. Virgin Islands"};
 
-    public CheckoutPage(WebDriver driver) {
+    public CheckoutShippingPage(WebDriver driver) {
         super(driver);
     }
 
@@ -152,10 +153,10 @@ public class CheckoutShippingPage extends PageFactory {
      * This method will open Checkout page entering url into the address field.
      */
     public void open() {
-        logger.info("Opening URL: " + getSecureBaseURL() + PAGE_ONEPAGE_CHECKOUT);
-        driver.get(getSecureBaseURL() + PAGE_ONEPAGE_CHECKOUT);
-        assertEquals("CHECKOUT PAGE WAS NOT OPENED", getSecureBaseURL() + PAGE_ONEPAGE_CHECKOUT, driver.getCurrentUrl());
-        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getSecureBaseURL() + PAGE_ONEPAGE_CHECKOUT, is404Page());
+        logger.info("Opening URL: " + getStartURL() + PAGE_CHECKOUT);
+        driver.get(getStartURL() + PAGE_CHECKOUT);
+        assertEquals("CHECKOUT PAGE WAS NOT OPENED", getStartURL() + PAGE_CHECKOUT, driver.getCurrentUrl());
+        assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL() + PAGE_CHECKOUT, is404Page());
     }
 
     /**
@@ -164,7 +165,7 @@ public class CheckoutShippingPage extends PageFactory {
      * @return Bool
      */
     public boolean isOpened() {
-        return driver.getCurrentUrl().equals(getSecureBaseURL() + PAGE_ONEPAGE_CHECKOUT);
+        return driver.getCurrentUrl().equals(getStartURL() + PAGE_CHECKOUT);
     }
 
     /**
@@ -374,27 +375,6 @@ public class CheckoutShippingPage extends PageFactory {
     }
 
     /**
-     * Fills in Billing Address Form with default values.
-     */
-    public void fillBillingAddressForm() {
-        fillBillingAddressForm("");
-    }
-
-    /**
-     * Fills in Billing Address Form with values based on specified state name.
-     * Note: If argument is not recognized fills in form with default values.
-     *
-     * @param stateName String "NEW_JERSEY"|"NEW_YORK"|"WASHINGTON"|"COLORADO"|any string
-     */
-    public void fillBillingAddressForm(String stateName) {
-        // Get all fields and dropdowns to fill by specified state
-        ArrayList<Field> billingAddressFields = getBillingFieldSet(stateName);
-        assertThat("FIELD SET IS BLANK!", billingAddressFields.size(), not(0));
-        logger.info("Fill out Billing Address Form");
-        fillFieldsSet(billingAddressFields);
-    }
-
-    /**
      * fills in Billing Credit Card Form
      */
     public void fillBillingCCForm() {
@@ -427,21 +407,21 @@ public class CheckoutShippingPage extends PageFactory {
         resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_FIRST_NAME, TEST_FIRST_NAME));
         resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_LAST_NAME, TEST_LAST_NAME));
         if (stateName.equals("NEW JERSEY")) {
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, NJ_GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, NJ_GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, NJ_GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, NJ_GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, NJ_GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, NJ_GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, NJ_GUEST_PHONE));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, NJ_GUEST_STREET_1));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, NJ_GUEST_STREET_2));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, NJ_GUEST_CITY));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, NJ_GUEST_STATE));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, NJ_GUEST_ZIP));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, NJ_GUEST_COUNTRY));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, NJ_GUEST_PHONE));
         } else if (stateName.equals("NEW YORK")) {
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, NY_GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, NY_GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, NY_GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, NY_GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, NY_GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, NY_GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, NY_GUEST_PHONE));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, NY_GUEST_STREET_1));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, NY_GUEST_STREET_2));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, NY_GUEST_CITY));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, NY_GUEST_STATE));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, NY_GUEST_ZIP));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, NY_GUEST_COUNTRY));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, NY_GUEST_PHONE));
         } else if (stateName.equals("WASHINGTON")) {
             resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, WA_GUEST_STREET_1));
             resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, WA_GUEST_STREET_2));
@@ -451,119 +431,31 @@ public class CheckoutShippingPage extends PageFactory {
             resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, WA_GUEST_COUNTRY));
             resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, WA_GUEST_PHONE));
         } else if (stateName.equals("COLORADO")) {
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, COL_GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, COL_GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, COL_GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, COL_GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, COL_GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, COL_GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, COL_GUEST_PHONE));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, COL_GUEST_STREET_1));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, COL_GUEST_STREET_2));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, COL_GUEST_CITY));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, COL_GUEST_STATE));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, COL_GUEST_ZIP));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, COL_GUEST_COUNTRY));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, COL_GUEST_PHONE));
         } else if (stateName.equals("OHIO")) {
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, OH_GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, OH_GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, OH_GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, OH_GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, OH_GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, OH_GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, OH_GUEST_PHONE));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, OH_GUEST_STREET_1));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, OH_GUEST_STREET_2));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, OH_GUEST_CITY));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, OH_GUEST_STATE));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, OH_GUEST_ZIP));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, OH_GUEST_COUNTRY));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, OH_GUEST_PHONE));
         } else {
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, GUEST_PHONE));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, GUEST_STREET_1));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, GUEST_STREET_2));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, GUEST_CITY));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, GUEST_STATE));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, GUEST_ZIP));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, GUEST_COUNTRY));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, GUEST_PHONE));
         }
         return resultFieldSet;
-    }
-
-    /**
-     * Creates and returns Billing address fields to fill on checkout with default values.
-     *
-     * @return ArrayList<Field> Fields set which is used in fillFieldsSet() method as argument
-     */
-    private ArrayList<Field> getBillingFieldSet() {
-        return getBillingFieldSet("");
-    }
-
-    /**
-     * Creates and returns Billing address fields to fill on checkout with values based on specified state name.
-     * Note: If argument is not recognized fields with default values will be returned
-     *
-     * @param stateName String "NEW_JERSEY"|"NEW_YORK"|"WASHINGTON"|"COLORADO"|any string
-     * @return ArrayList<Field> Fields set which is used in fillFieldsSet() method as argument
-     */
-    private ArrayList<Field> getBillingFieldSet(String stateName) {
-        ArrayList<Field> resultFieldSet = new ArrayList<Field>();
-        // create billing field sets for every declared state
-        resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_FIRST_NAME, TEST_FIRST_NAME));
-        resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_LAST_NAME, TEST_LAST_NAME));
-        if (stateName.equals("NEW_JERSEY")) {
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, NJ_GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, NJ_GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, NJ_GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, NJ_GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, NJ_GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, NJ_GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, NJ_GUEST_PHONE));
-        } else if (stateName.equals("NEW_YORK")) {
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, NY_GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, NY_GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, NY_GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, NY_GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, NY_GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, NY_GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, NY_GUEST_PHONE));
-        } else if (stateName.equals("WASHINGTON")) {
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, WA_GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, WA_GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, WA_GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, WA_GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, WA_GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, WA_GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, WA_GUEST_PHONE));
-        } else if (stateName.equals("COLORADO")) {
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, COL_GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, COL_GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, COL_GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, COL_GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, COL_GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, COL_GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, COL_GUEST_PHONE));
-        } else if (stateName.equals("OHIO")) {
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, OH_GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, OH_GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, OH_GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, OH_GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, OH_GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, OH_GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, OH_GUEST_PHONE));
-        } else {
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, GUEST_PHONE));
-        }
-        return resultFieldSet;
-    }
-
-    /**
-     * Searches products in the Order summary section, and returns count of found products and their qty sum.
-     *
-     * @return int sum of products and their qty in cart(Order summary section).
-     */
-    public int getCountOfProductsInCart() {
-        int total = 0;
-        for (int i = 1, productLines = driver.findElements(PRODUCT_LINE_ORDER_SUMMURY).size(); i <= productLines; i += 1) {
-            String textQty = driver.findElement(PRODUCT_LINE_ORDER_SUMMURY).findElement(By.xpath("//span[@class='qty']")).getText();
-            int qty = Integer.parseInt(textQty.substring(textQty.lastIndexOf(":") + 2, textQty.length()));
-            total += qty;
-        }
-        return total;
     }
 
     /**
@@ -791,57 +683,14 @@ public class CheckoutShippingPage extends PageFactory {
                 isElementPresent(By.xpath("//div[contains(@class, 'giftMessage') and contains(., '" + textToVerify + "')]")));
     }
 
-    /**
-     * This method verifies that saved Credit Card is displayed on Checkout Page by checking that selected value is not default one.
-     */
-    public void verifyPreSavedCCIsDisplayed() {
-        logger.info("Verifying \"Choose or add a card\" Dropdown shows selected Credit Card on checkout page");
-        assertTrue(driver.findElement(DROPDOWN_BILLING_CC).isDisplayed());
-        Select ccSelect = new Select(driver.findElement(DROPDOWN_BILLING_CC));     //Store the DropDown
-        assertFalse(ccSelect.getFirstSelectedOption().getText().equals("New Credit Card"));
-        assertFalse(ccSelect.getFirstSelectedOption().getText().equals("--Please Select a Stored Credit Card--"));
-    }
 
-    /**
-     * This method checks "New Credit Card Form" is displayed on checkout page and it has "Set As Default Card" option.
-     * And Throws Exception if not.
-     */
-    public void verifyNewCreditCardFormIsDisplayed() {
-        logger.info("Verifying the Form for adding new Credit is displayed on checkout page and it has \"Set As Default Card\" option");
-        assertTrue(driver.findElement(FORM_BILLING_CC_NEW_CARD).isDisplayed());
-        assertTrue(driver.findElement(CHECKBOX_BILLING_CC_SET_NEW_CC_AS_DEFAULT).isDisplayed());
-    }
-
-    /**
-     * This method checks  Placing Order Loading(indication that order is processing at present moment) is present.
-     */
-    public void verifyPlacingOrderLoadingMaskIsPresent() {
-        logger.info("Verifying Placing Order Loading(indication that order is processing at present moment) is present.");
-        waitForElementIsVisible("PLACING ORDER LOADING MASK DID NOT APPEAR AFTER 10 SECONDS", CheckoutPage.LOADING_MASK_PLACING_ORDER, 10);
-    }
-
-    /**
-     * Verifies that shipping and billing forms have different data entered
-     */
-    public void verifyDifferentDataInShippingAndBilling() {
-        assertFalse(driver.findElement(FIELD_BILLING_ADDRESS_STREET_1).getAttribute("value").equals(
-                driver.findElement(FIELD_SHIPPING_ADDRESS_STREET_1).getAttribute("value")));
-        assertFalse(driver.findElement(FIELD_BILLING_ADDRESS_STREET_2).getAttribute("value").equals(
-                driver.findElement(FIELD_SHIPPING_ADDRESS_STREET_2).getAttribute("value")));
-        assertFalse(driver.findElement(FIELD_BILLING_ADDRESS_CITY).getAttribute("value").equals(
-                driver.findElement(FIELD_SHIPPING_ADDRESS_CITY).getAttribute("value")));
-        assertFalse((new Select(driver.findElement(DROPDOWN_BILLING_ADDRESS_STATE))).getFirstSelectedOption().getText().equals(
-                new Select(driver.findElement(DROPDOWN_SHIPPING_ADDRESS_STATE)).getFirstSelectedOption().getText()));
-        assertFalse(driver.findElement(FIELD_BILLING_ADDRESS_ZIP_CODE).getAttribute("value").equals(
-                driver.findElement(FIELD_SHIPPING_ADDRESS_ZIP_CODE).getAttribute("value")));
-    }
 
     /**
      * Verifies that list of countries is default
      */
     public void verifyListOfCountries() {
-        assertTrue("SHIPPING COUNTRY DROP DOWN IS NOT THERE!", driver.findElement(CheckoutPage.DROPDOWN_SHIPPING_ADDRESS_COUNTRY).isDisplayed());
-        Select select = new Select(driver.findElement(CheckoutPage.DROPDOWN_SHIPPING_ADDRESS_COUNTRY));
+        assertTrue("SHIPPING COUNTRY DROP DOWN IS NOT THERE!", driver.findElement(DROPDOWN_SHIPPING_ADDRESS_COUNTRY).isDisplayed());
+        Select select = new Select(driver.findElement(DROPDOWN_SHIPPING_ADDRESS_COUNTRY));
         List<WebElement> options = select.getOptions();
         int length = 0;
         for (WebElement option : options) {
@@ -911,20 +760,6 @@ public class CheckoutShippingPage extends PageFactory {
         }
     }
 
-
-    /**
-     * Verifies that tax amount is calculated correctly .
-     *
-     * @param taxRate Double number, expected tax amount in percentage
-     */
-    public void verifyTaxCalculations(double taxRate) {
-        String actualTaxAmount = getTaxAmount().replace("$", "");
-        String actualShippingAmount = getShippingAmount().replace("$", "");
-        String actualSubtotal = getSubtotalAmount().replace("$", "");
-        double expectedTaxAmount = (Double.parseDouble(actualSubtotal) + Double.parseDouble(actualShippingAmount)) * taxRate;
-        assertEquals("Expected tax amount: " + expectedTaxAmount + " is not equal to actual: " + actualTaxAmount,
-                expectedTaxAmount, Double.parseDouble(actualTaxAmount), DELTA);
-    }
 
     /**
      * Check if specified shipping method is available in DropDown

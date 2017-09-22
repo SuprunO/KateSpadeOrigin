@@ -46,6 +46,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.rules.TestWatcher;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -83,7 +84,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     /* Config: received from command arguments */
     private static boolean enableJavascript = false;
     private static boolean sslEnabled = false;
-    private static String baseUrl = "http://lea-magedev.lcgosc.com/";
+    private static String baseUrl = "http://dev01.katespade.5andp.com/";
     private static String secureBaseUrl;
     private static String[] sauceLabsParameters;
     protected static String sauceLabsSession;
@@ -111,11 +112,18 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     private static long testCaseExecutionTime;
 
     /* Page Object: Pages declaration */
+    private Header header;
+    private Footer footer;
     private HomePage homePage;
     private LoginSignUpPage loginSignUpPage;
     private MyAccountPages myAccountPages;
-    private Header header;
-    private Footer footer;
+    private ProductDetailsPage productDetailsPage;
+    private ShoppingCartPage shoppingCartPage;
+    private CheckoutLoginPage checkoutLoginPage;
+    private CheckoutShippingPage checkoutShippingPage;
+    private CheckoutBillingPage checkoutBillingPage;
+    private CheckoutOrderReviewPage checkoutOrderReviewPage;
+    private CheckoutSuccessPage checkoutSuccessPage;
 
     /**
      * JUnit Rule which will record the test name of the current test.
@@ -437,6 +445,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      * https://sites.google.com/a/chromium.org/chromedriver/downloads
      */
     private void launchChrome() {
+        setChromeDriverSystemProperty(); //set path to driver
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--start-maximized"); // It has issues with resizing.
         /* Chromedriver 2.10 starts with message:
@@ -444,6 +453,34 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         More details by link: https://code.google.com/p/chromedriver/issues/detail?id=799 */
         options.addArguments("test-type"); // Fix for warning above
         driver = new ChromeDriver(options);
+    }
+
+    /**
+     * Method will set automatically path to chromedriver according to the system which used
+     *
+     */
+    private void setChromeDriverSystemProperty() {
+        Platform currentPlatform = Platform.getCurrent();
+        if(currentPlatform.is(Platform.WINDOWS)){ //TODO: some old hack... need to check is it still needed
+            currentPlatform = Platform.WINDOWS;
+        }
+        switch (currentPlatform) {
+            //assume chromedriver from http://code.google.com/p/chromedriver/downloads/list is one above project directory (where pom.xml is)
+            case WINDOWS:
+                System.setProperty("webdriver.chrome.driver", "C:\\selenium\\chromedriver.exe"); //FOR WINDOWS
+                break;
+            case WIN8_1:
+                System.setProperty("webdriver.chrome.driver", "C:\\selenium\\chromedriver.exe"); //FOR WINDOWS
+                break;
+            case MAC:
+                System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver"); //FOR MAC
+                break;
+            case UNIX:
+                System.setProperty("webdriver.chrome.driver", "../chromedriver"); //FOR UNIX
+                break;
+            default:
+                logger.error("CHROME IS UNSUPPORTED ON THIS OS:" + currentPlatform);
+        }
     }
 
     /**
@@ -589,7 +626,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     /**
      * Method for returning page by request
      *
-     * @return MavenStylePage
+     * @return HomePage
      */
     public HomePage homePage() {
         if (homePage == null) {
@@ -599,7 +636,91 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     }
 
     /**
-     * Log all parameters to the JSON log file.  This method creates a unique
+     * Method for returning page by request
+     *
+     * @return HomePage
+     */
+    public ProductDetailsPage productDetailsPage() {
+        if (productDetailsPage == null) {
+            productDetailsPage = new ProductDetailsPage(driver);
+        }
+        return productDetailsPage;
+    }
+
+    /**
+     * Method for returning page by request
+     *
+     * @return ShoppingCartPage
+     */
+    public ShoppingCartPage shoppingCartPage() {
+        if (shoppingCartPage == null) {
+            shoppingCartPage = new ShoppingCartPage(driver);
+        }
+        return shoppingCartPage;
+    }
+
+    /**
+     * Method for returning page by request
+     *
+     * @return CheckoutLoginPage
+     */
+    public CheckoutLoginPage checkoutLoginPage() {
+        if (checkoutLoginPage == null) {
+            checkoutLoginPage = new CheckoutLoginPage(driver);
+        }
+        return checkoutLoginPage;
+    }
+
+    /**
+     * Method for returning page by request
+     *
+     * @return CheckoutShippingPage
+     */
+    public CheckoutShippingPage checkoutShippingPage() {
+        if (checkoutShippingPage == null) {
+            checkoutShippingPage = new CheckoutShippingPage(driver);
+        }
+        return checkoutShippingPage;
+    }
+
+    /**
+     * Method for returning page by request
+     *
+     * @return CheckoutBillingPage
+     */
+    public CheckoutBillingPage checkoutBillingPage() {
+        if (checkoutBillingPage == null) {
+            checkoutBillingPage = new CheckoutBillingPage(driver);
+        }
+        return checkoutBillingPage;
+    }
+
+    /**
+     * Method for returning page by request
+     *
+     * @return CheckoutOrderReviewPage
+     */
+    public CheckoutOrderReviewPage checkoutOrderReviewPage() {
+        if (checkoutOrderReviewPage == null) {
+            checkoutOrderReviewPage = new CheckoutOrderReviewPage(driver);
+        }
+        return checkoutOrderReviewPage;
+    }
+
+    /**
+     * Method for returning page by request
+     *
+     * @return CheckoutSuccessPage
+     */
+    public CheckoutSuccessPage checkoutSuccessPage() {
+        if (checkoutSuccessPage == null) {
+            checkoutSuccessPage = new CheckoutSuccessPage(driver);
+        }
+        return checkoutSuccessPage;
+    }
+
+    /**
+     * Log all parameters to the XML log file.  This method creates a unique
      * filename by appending the current time in milliseconds to the name
      * of the file.  For example: testCaseName1381859201591.json
      *

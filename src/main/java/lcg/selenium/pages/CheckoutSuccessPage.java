@@ -38,16 +38,9 @@ import lcg.selenium.PageFactory;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static lcg.selenium.TestFactory.getStartURL;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
 
 /**
  * A class, which contains implemented actions and verifications, which can be performed on Checkout page
@@ -72,7 +65,7 @@ public class CheckoutSuccessPage extends PageFactory {
      * @return Bool
      */
     public boolean isOpened() {
-        return driver.getCurrentUrl().equals(getSecureBaseURL() + PAGE_ORDER_SUCCESS);
+        return driver.getCurrentUrl().equals(getStartURL() + PAGE_ORDER_SUCCESS);
     }
 
 

@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
+import static lcg.selenium.TestFactory.getStartURL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -77,9 +78,9 @@ public class ShoppingCartPage extends PageFactory {
      * This method opens Shopping Cart Page.
      */
     public void open() {
-        logger.info("Opening URL: " + getSecureBaseURL() + PAGE_SHOPPING_CART);
-        driver.get(getSecureBaseURL() + PAGE_SHOPPING_CART);
-        assertEquals("SHOPPING CART PAGE WAS NOT OPENED", getSecureBaseURL() + PAGE_SHOPPING_CART, driver.getCurrentUrl());
+        logger.info("Opening URL: " + getStartURL() + PAGE_SHOPPING_CART);
+        driver.get(getStartURL() + PAGE_SHOPPING_CART);
+        assertEquals("SHOPPING CART PAGE WAS NOT OPENED", getStartURL() + PAGE_SHOPPING_CART, driver.getCurrentUrl());
     }
 
     /**
@@ -88,7 +89,7 @@ public class ShoppingCartPage extends PageFactory {
      * @return Bool
      */
     public boolean isOpened() {
-        return driver.getCurrentUrl().equals(getSecureBaseURL() + PAGE_SHOPPING_CART);
+        return driver.getCurrentUrl().equals(getStartURL() + PAGE_SHOPPING_CART);
     }
 
     /**

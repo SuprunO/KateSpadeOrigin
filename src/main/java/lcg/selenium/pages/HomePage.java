@@ -65,25 +65,11 @@ public class HomePage extends PageFactory {
      * Opens Home Page entering url into the address field.
      */
     public void open() {
-        logger.info(getStartURL() + " Status Code is " + getStatusCode(getStartURL()));
+        //logger.info(getStartURL() + " Status Code is " + getStatusCode(getStartURL()));
         logger.info("Opening URL: " + getStartURL());
         driver.get(getStartURL());
         assertEquals("HOME PAGE WAS NOT OPENED", getStartURL(), driver.getCurrentUrl());
         assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL(), is404Page());
     }
 
-    /**
-     * Extracts products' names of "In Stock" product from current page and put it to List for further usage.
-     *
-     * @return List of Strings
-     */
-    public List<String> getListOfBestsellersNames() {
-        List<String> inStockNames = new ArrayList<>();
-        assertTrue("NO PRODUCTS GRID AVAILABLE.", isElementPresent(By.xpath(PATH_TO_BESTSELLERS_LIST)));
-        for (WebElement link : driver.findElements(By.xpath(PATH_TO_BESTSELLERS_LIST +
-                "/li/div/a"))) {
-            inStockNames.add(link.getAttribute("title"));
-        }
-        return inStockNames;
-    }
 }
