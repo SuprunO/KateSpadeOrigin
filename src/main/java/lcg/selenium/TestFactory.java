@@ -61,8 +61,11 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.text.*;
-import java.util.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -84,7 +87,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     /* Config: received from command arguments */
     private static boolean enableJavascript = false;
     private static boolean sslEnabled = false;
-    private static String baseUrl = "http://dev01.katespade.5andp.com/";
+    private static String baseUrl = "https://www.katespade.com/";
     private static String secureBaseUrl;
     private static String[] sauceLabsParameters;
     protected static String sauceLabsSession;
@@ -706,6 +709,8 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         }
         return checkoutOrderReviewPage;
     }
+
+
 
     /**
      * Method for returning page by request

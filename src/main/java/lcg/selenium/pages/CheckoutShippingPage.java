@@ -73,19 +73,19 @@ public class CheckoutShippingPage extends PageFactory {
     public static final By DROPDOWN_SHIPPING_INFO = By.id("shipping-address-select");
     public static final By TEXT_SHIPPING_INFO_DISPLAYED_INFO = By.id("current-shipping-customer-address");
     public static final By FORM_SHIPPING_INFO_NEW_ADDRESS = By.id("shipping-new-address-form");
-    public static final By FIELD_SHIPPING_ADDRESS_FIRST_NAME = By.id("shipping:firstname");
-    public static final By FIELD_SHIPPING_ADDRESS_LAST_NAME = By.id("shipping:lastname");
-    public static final By FIELD_SHIPPING_ADDRESS_STREET_1 = By.id("shipping:street1");
-    public static final By FIELD_SHIPPING_ADDRESS_STREET_2 = By.id("shipping:street2");
-    public static final By FIELD_SHIPPING_ADDRESS_CITY = By.id("shipping:city");
-    public static final By DROPDOWN_SHIPPING_ADDRESS_STATE = By.id("shipping:region_id");
-    public static final By DROPDOWN_SHIPPING_ADDRESS_COUNTRY = By.id("shipping:country_id");
-    public static final By FIELD_SHIPPING_ADDRESS_ZIP_CODE = By.id("shipping:postcode");
-    public static final By FIELD_SHIPPING_ADDRESS_TELEPHONE = By.id("shipping:telephone");
-
+    public static final By FIELD_SHIPPING_ADDRESS_FIRST_NAME = By.cssSelector("#dwfrm_singleshipping_shippingAddress_addressFields_firstName");
+    public static final By FIELD_SHIPPING_ADDRESS_LAST_NAME = By.cssSelector("#dwfrm_singleshipping_shippingAddress_addressFields_lastName");
+    public static final By FIELD_SHIPPING_ADDRESS_STREET_1 = By.cssSelector("#dwfrm_singleshipping_shippingAddress_addressFields_address1");
+    public static final By FIELD_SHIPPING_ADDRESS_STREET_2 = By.id("dwfrm_singleshipping_shippingAddress_addressFields_address2");
+    public static final By FIELD_SHIPPING_ADDRESS_CITY = By.cssSelector("#dwfrm_singleshipping_shippingAddress_addressFields_city");
+    public static final By DROPDOWN_SHIPPING_ADDRESS_STATE = By.cssSelector("#dwfrm_singleshipping_shippingAddress_addressFields_states_state");
+    public static final By DROPDOWN_SHIPPING_ADDRESS_COUNTRY = By.cssSelector("#dwfrm_singleshipping_shippingAddress_addressFields_country");
+    public static final By FIELD_SHIPPING_ADDRESS_ZIP_CODE = By.cssSelector("#dwfrm_singleshipping_shippingAddress_addressFields_zip");
+    public static final By FIELD_SHIPPING_ADDRESS_TELEPHONE = By.cssSelector("#dwfrm_singleshipping_shippingAddress_addressFields_phone");
+    public static final By FIELD_SHIPPING_ADDRESS_EMAIL = By.cssSelector("#dwfrm_singleshipping_shippingAddress_addressFields_email");
     /* Billing Address Step */
-    public static final String ID_BILLING_ADDRESS_SAME_AS_SHIPPING_CHECKBOX = "shipping:use_for_billing";
-    public static final By CHECKBOX_BILLING_ADDRESS_SAME_AS_SHIPPING = By.id(ID_BILLING_ADDRESS_SAME_AS_SHIPPING_CHECKBOX);
+    public static final String ID_BILLING_ADDRESS_SAME_AS_SHIPPING_CHECKBOX = ".useaddress-row.shipping-addr-use-as-billing>div>label>span";
+    public static final By CHECKBOX_BILLING_ADDRESS_SAME_AS_SHIPPING = By.cssSelector(ID_BILLING_ADDRESS_SAME_AS_SHIPPING_CHECKBOX);
     public static final By DROPDOWN_BILLING_INFO = By.id("billing-address-select");
     public static final By TEXT_BILLING_INFO_DISPLAYED_INFO = By.id("current-billing-customer-address");
     public static final By FORM_BILLING_INFO_NEW_ADDRESS = By.id("billing-new-address-form");
@@ -124,7 +124,7 @@ public class CheckoutShippingPage extends PageFactory {
     /* Order Summary Block */
     public static final By TITLE_GIFT_BOX_PRODUCT_NAME = By.xpath("//h2[contains(@class, 'product-name') and contains(., 'Gift Box')]");
     public static final By PRODUCT_LINE_ORDER_SUMMURY = By.xpath("//table[@id='checkout-review-table']/tbody/tr");
-    public static final By SUBTOTAL_AMOUNT = By.xpath("//span[@class='subtotal']/span");
+    public static final By CONTINUE_TO_PAYMENT = By.cssSelector("#single_shipping_form");
     public static final By GRAND_TOTAL_AMOUNT = By.xpath("//span[@class='grand-total']/span[@class = 'price']");
     public static final By DROPDOWN_SHIPPING_TYPE = By.xpath("//td[@class='shipping_method_column']/../td[2]/span");
     //select[@name="shipping_method"]
@@ -342,7 +342,8 @@ public class CheckoutShippingPage extends PageFactory {
      * Checks "Billing address same as shipping" checkbox if it is not already checked.
      */
     public void checkCheckboxBillingSameAsShipping() {
-        checkCheckbox(CHECKBOX_BILLING_ADDRESS_SAME_AS_SHIPPING, "Billing address same as shipping");
+        clickOnElement(CHECKBOX_BILLING_ADDRESS_SAME_AS_SHIPPING,"this is also my billing address");
+       // checkCheckbox(CHECKBOX_BILLING_ADDRESS_SAME_AS_SHIPPING, "Billing address same as shipping");
     }
 
     /**
@@ -371,8 +372,9 @@ public class CheckoutShippingPage extends PageFactory {
         assertThat("FIELD SET IS BLANK!", shippingAddressFields.size(), not(0));
         logger.info("Fill out Shipping Address Form");
         fillFieldsSet(shippingAddressFields);
-        clickOnElement(SUBTOTAL_AMOUNT, "Subtotal amount");
-    }
+     //   checkCheckboxBillingSameAsShipping();
+        clickOnElement(CONTINUE_TO_PAYMENT, "ContinueToPayment"); //ClickOnConinueToPaymentButton
+}
 
     /**
      * fills in Billing Credit Card Form
@@ -381,8 +383,8 @@ public class CheckoutShippingPage extends PageFactory {
         logger.info("Fill out Billing Credit Card Form");
         waitForElementIsVisible(FIELD_BILLING_CC_NUMBER);
         fillInInput(FIELD_BILLING_CC_NUMBER, TEST_CARD_NUMBER);
-        selectValueInDropDown(DROPDOWN_BILLING_CC_EXPIRATION_MONTH, TEST_CARD_MONTH);
-        selectValueInDropDown(DROPDOWN_BILLING_CC_EXPIRATION_YEAR, TEST_CARD_YEAR);
+      //  selectValueInDropDown(DROPDOWN_BILLING_CC_EXPIRATION_MONTH, TEST_CARD_MONTH);
+       // selectValueInDropDown(DROPDOWN_BILLING_CC_EXPIRATION_YEAR, TEST_CARD_YEAR);
     }
 
     /**
@@ -422,7 +424,7 @@ public class CheckoutShippingPage extends PageFactory {
 //            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, NY_GUEST_ZIP));
 //            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, NY_GUEST_COUNTRY));
 //            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, NY_GUEST_PHONE));
-        } else if (stateName.equals("WASHINGTON")) {
+        } else if (stateName.equals("IL - Illinois")) {
             resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, WA_GUEST_STREET_1));
             resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, WA_GUEST_STREET_2));
             resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, WA_GUEST_CITY));
@@ -430,6 +432,8 @@ public class CheckoutShippingPage extends PageFactory {
             resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, WA_GUEST_ZIP));
             resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, WA_GUEST_COUNTRY));
             resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, WA_GUEST_PHONE));
+            resultFieldSet.add(new Field("input",FIELD_SHIPPING_ADDRESS_EMAIL,WA_GUEST_EMAIL ));
+
         } else if (stateName.equals("COLORADO")) {
 //            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, COL_GUEST_STREET_1));
 //            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, COL_GUEST_STREET_2));
@@ -463,16 +467,18 @@ public class CheckoutShippingPage extends PageFactory {
      *
      * @return String
      */
-    public String getSubtotalAmount() {
-        assertTrue("COULD NOT FIND SUBTOTAL AMOUNT", isElementPresent(SUBTOTAL_AMOUNT));
-        return driver.findElement(SUBTOTAL_AMOUNT).getText();
-    }
+//    public String getSubtotalAmount() {
+//        assertTrue("COULD NOT FIND SUBTOTAL AMOUNT", isElementPresent(SUBTOTAL_AMOUNT));
+//        return driver.findElement(SUBTOTAL_AMOUNT).getText();
+//    }
 
     /**
      * Gets Tax value in Totals sections if it is exist and return it
      *
      * @return String
      */
+
+    // We Don't need this
     public String getTaxAmount() {
         if (isElementPresent(TITLE_TAX)) {
             return driver.findElement(TAX_AMOUNT).getText();
@@ -486,6 +492,8 @@ public class CheckoutShippingPage extends PageFactory {
      *
      * @return String
      */
+
+    //This also
     public String getShippingAmount() {
         assertTrue("COULD NOT FIND SHIPPING AMOUNT", isElementPresent(SHIPPING_AMOUNT));
         return driver.findElement(SHIPPING_AMOUNT).getText();

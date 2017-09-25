@@ -33,14 +33,7 @@
 package lcg.selenium.KateSpade;
 
 import lcg.selenium.TestFactory;
-import lcg.selenium.pages.*;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.openqa.selenium.By;
-
-import java.util.ArrayList;
-
-import static org.junit.Assert.*;
 
 /**
  * Simple login tests.  Can be run as load tests using JMeter or other load tool.
@@ -64,24 +57,23 @@ public class CheckoutAsGuest extends TestFactory {
         log("Stating step: ");
         log("@Given: I am on \"Shopping Bag\" page as Guest with random product in cart.");
         homePage().open();
-        productDetailsPage().openById("PXRU6931");
-        productDetailsPage().clickButtonAddToCart();
-        header().clickOnCartIcon();
+        productDetailsPage().openById("PXRU8215");
+        productDetailsPage().clickButtonAddToCart();             // Change to "ClickOnAddToBagButton"
+        //       header().clickOnCartIcon();                            // Meaningless
         log("@Given step: PASSED!");
         log("Stating step: ");
         log("@When: I go to Checkout as Guest");
-        shoppingCartPage().clickCheckoutButton();
-        checkoutLoginPage().clickButtonContinueAsGuest();
+        shoppingCartPage().clickCheckoutButton();                // ClickOnViewBagCheckoutButtonInMinicart
+        checkoutLoginPage().clickProceedToCheckoutButton();
         log("@When step: PASSED!");
         log("Stating step: ");
         log("@Then: I can fill all correct information and place order.");
-        checkoutShippingPage().fillShippingAddressForm("WASHINGTON");
-        checkoutShippingPage().checkCheckboxBillingSameAsShipping();
+        checkoutLoginPage().clickButtonContinueAsGuest();
+        checkoutShippingPage().fillShippingAddressForm("IL - Illinois");
         checkoutBillingPage().fillBillingCCForm();
-//TODO:        checkoutBillingPage().clickButtonContinue();
-        checkoutOrderReviewPage().clickPlaceOrderButton();
-        checkoutOrderReviewPage().waitForOrderIsPlaced();
-        assertTrue(checkoutSuccessPage().isOpened());
+        checkoutOrderReviewPage().verifyShippingAddressHeaderisPresent();
+
+
         log("@Then step: PASSED!");
     }
 }

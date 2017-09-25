@@ -38,16 +38,11 @@ import lcg.selenium.PageFactory;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * A class, which contains implemented actions and verifications, which can be performed on Checkout page
@@ -58,11 +53,11 @@ public class CheckoutBillingPage extends PageFactory {
 
     public Logger logger = Logger.getLogger(CheckoutBillingPage.class);
 
-    public static final By BUTTON_PLACE_ORDER = By.xpath("//button[@class='btn-cart btn-checkout pink-button']");
+    public static final By BUTTON_REVIEW_YOUR_ORDER = By.cssSelector(".continuecheckoutbutton.form-row.form-row-button>button");
 
     /* Billing Address Step */
-    public static final String ID_BILLING_ADDRESS_SAME_AS_SHIPPING_CHECKBOX = "shipping:use_for_billing";
-    public static final By CHECKBOX_BILLING_ADDRESS_SAME_AS_SHIPPING = By.id(ID_BILLING_ADDRESS_SAME_AS_SHIPPING_CHECKBOX);
+    public static final String ID_BILLING_ADDRESS_SAME_AS_SHIPPING_CHECKBOX = ".form-row.sameshipping.label-inline.form-indent.notselect>label";
+    public static final By CHECKBOX_BILLING_ADDRESS_SAME_AS_SHIPPING = By.cssSelector(ID_BILLING_ADDRESS_SAME_AS_SHIPPING_CHECKBOX);
     public static final By DROPDOWN_BILLING_INFO = By.id("billing-address-select");
     public static final By TEXT_BILLING_INFO_DISPLAYED_INFO = By.id("current-billing-customer-address");
     public static final By FORM_BILLING_INFO_NEW_ADDRESS = By.id("billing-new-address-form");
@@ -77,13 +72,15 @@ public class CheckoutBillingPage extends PageFactory {
     public static final By FIELD_BILLING_ADDRESS_TELEPHONE = By.id("billing:telephone");
 
     /* Billing Credit Card(CC) Step */
-    public static final By DROPDOWN_BILLING_CC = By.id("tokens");
-    public static final By FORM_BILLING_CC_NEW_CARD = By.id("new_card_fields");
-    public static final By CHECKBOX_BILLING_CC_SET_NEW_CC_AS_DEFAULT = By.id("set_as_default");
-    public static final By FIELD_BILLING_CC_NUMBER = By.id("creditcard_cc_number");
-    public static final By DROPDOWN_BILLING_CC_TYPE = By.id("creditcard_cc_type");     // investigate usage! no such dropdown...
-    public static final By DROPDOWN_BILLING_CC_EXPIRATION_MONTH = By.id("creditcard_expiration");
-    public static final By DROPDOWN_BILLING_CC_EXPIRATION_YEAR = By.id("creditcard_expiration_yr");
+//    public static final By DROPDOWN_BILLING_CC = By.id("tokens");
+    //   public static final By FORM_BILLING_CC_NEW_CARD = By.id("new_card_fields");
+//    public static final By CHECKBOX_BILLING_CC_SET_NEW_CC_AS_DEFAULT = By.id("set_as_default");
+    public static final By FIELD_BILLING_CC_NAMEONCARD = By.cssSelector("#dwfrm_billing_paymentMethods_creditCard_owner");
+    public static final By FIELD_BILLING_CC_NUMBER = By.cssSelector("#dwfrm_billing_paymentMethods_creditCard_number");
+    //public static final By DROPDOWN_BILLING_CC_TYPE = By.id("creditcard_cc_type");     // investigate usage! no such dropdown...
+    public static final By FIELD_BILLING_CC_EXPIRATION_MONTHYEAR = By.cssSelector("#dwfrm_billing_paymentMethods_creditCard_expirationdate");
+    public static final By FIELD_BILLING_CC_CVV = By.cssSelector(".payment-method.payment-method-expanded:nth-child(3)>div:nth-child(7)>input");
+    //  public static final By DROPDOWN_BILLING_CC_EXPIRATION_YEAR = By.id("creditcard_expiration_yr");
 
 
     public CheckoutBillingPage(WebDriver driver) {
@@ -132,12 +129,25 @@ public class CheckoutBillingPage extends PageFactory {
     public void fillBillingCCForm() {
         logger.info("Fill out Billing Credit Card Form");
         waitForElementIsVisible(FIELD_BILLING_CC_NUMBER);
+        fillInInput(FIELD_BILLING_CC_NAMEONCARD, TEST_CARD_NAME);
         fillInInput(FIELD_BILLING_CC_NUMBER, TEST_CARD_NUMBER);
-        selectValueInDropDown(DROPDOWN_BILLING_CC_EXPIRATION_MONTH, TEST_CARD_MONTH);
-        selectValueInDropDown(DROPDOWN_BILLING_CC_EXPIRATION_YEAR, TEST_CARD_YEAR);
+        fillInInput(FIELD_BILLING_CC_EXPIRATION_MONTHYEAR, TEST_CARD_MONTHYEAR);
+        fillInInput(FIELD_BILLING_CC_CVV, TEST_CARD_CVV);
+        clickOnElement(CHECKBOX_BILLING_ADDRESS_SAME_AS_SHIPPING , "same as shipping");
+        waitForElementIsVisible(BUTTON_REVIEW_YOUR_ORDER);
+        clickOnElement(BUTTON_REVIEW_YOUR_ORDER, "ReviewYourOrder");
     }
 
-     /**
+    /**
+     * Checking the
+     */
+
+
+
+
+
+
+    /**
      * Creates and returns Billing address fields to fill on checkout with default values.
      *
      * @return ArrayList<Field> Fields set which is used in fillFieldsSet() method as argument
@@ -182,6 +192,7 @@ public class CheckoutBillingPage extends PageFactory {
             resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, WA_GUEST_ZIP));
             resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, WA_GUEST_COUNTRY));
             resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, WA_GUEST_PHONE));
+
         } else if (stateName.equals("COLORADO")) {
 //            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, COL_GUEST_STREET_1));
 //            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, COL_GUEST_STREET_2));

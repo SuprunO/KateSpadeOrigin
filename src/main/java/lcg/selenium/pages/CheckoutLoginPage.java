@@ -33,21 +33,10 @@
 
 package lcg.selenium.pages;
 
-import lcg.selenium.Field;
 import lcg.selenium.PageFactory;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
 
 /**
  * A class, which contains implemented actions and verifications, which can be performed on Checkout page
@@ -61,8 +50,11 @@ public class CheckoutLoginPage extends PageFactory {
     public static final By LINK_TERMS_AND_CONDITIONS = By.xpath("//a[contains(text(), 'Terms & Conditions')]");
     public static final By LINK_PRIVACY_POLICY = By.xpath("//a[@name='trustlink']");
 
-    public static final By BUTTON_CREATE_ACCOUNT = By.id("co-registration-form");
-    public static final By BUTTON_CONTINUE_AS_GUEST = By.id("guest");
+  //  public static final By BUTTON_CREATE_ACCOUNT = By.id("co-registration-form");
+    public static final By PROCEED_TO_CHECKOUT = By.xpath(".//div/fieldset/button");
+    public static final By BUTTON_CONTINUE_AS_GUEST = By.cssSelector(".form-row.form-row-button:first-child");
+
+   //FOR REGISTERED USER
     public static final By FIELD_LOGIN_FORM_CHECKOUT_EMAIL = By.id("login-email");
     public static final By FIELD_LOGIN_FORM_CHECKOUT_PASSWORD = By.id("login-password");
     public static final By BUTTON_LOGIN_FORM_CHECKOUT_LOGIN = By.id("jcheckout-login-button");
@@ -72,10 +64,16 @@ public class CheckoutLoginPage extends PageFactory {
     }
 
 
+    public void clickProceedToCheckoutButton() {
+        waitForElementIsVisible(PROCEED_TO_CHECKOUT);
+        clickOnElement(PROCEED_TO_CHECKOUT, "Proceed To Checkout button");
+    }
+
     public void clickButtonContinueAsGuest() {
         waitForElementIsVisible(BUTTON_CONTINUE_AS_GUEST);
         clickOnElement(BUTTON_CONTINUE_AS_GUEST, "Guest Checkout button");
     }
+
 
     /**
      * Makes customer logged in on checkout page with specified Email and Password.

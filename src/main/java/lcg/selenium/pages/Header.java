@@ -54,7 +54,7 @@ public class Header extends PageFactory {
     /* Header Elements */
     public static final By LOGO = By.xpath("//a[@class='logo']");
     public static final By FIELD_SEARCH = By.id("search");
-    public static final By ICON_SHOPPING_CART = By.id("quick-access-cart-icon");
+    public static final By ICON_SHOPPING_CART = By.cssSelector(".minicart-icon");
     public static final By QUICK_ACCESS_ACCOUNT = By.id("quick-access-account");
 
     public static final By POPUP_MINICART = By.xpath("//div[@class='mini-cart-content']");

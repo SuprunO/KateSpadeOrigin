@@ -278,8 +278,8 @@ public class MyAccountPages extends PageFactory{
                 /* type, key is input field locator(class By) , value is String filling in this input */
         myAccNewCardFields.add(new Field(Field.SELECT, ADD_CARD_DROPDOWN_CREDIT_CARD_TYPE, TEST_CARD_TYPE));
         myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_FIELD_CREDIT_CARD_NUMBER, TEST_CARD_NUMBER));
-        myAccNewCardFields.add(new Field(Field.SELECT, ADD_CARD_DROPDOWN_EXPIRATION_MONTH, TEST_CARD_MONTH));
-        myAccNewCardFields.add(new Field(Field.SELECT, ADD_CARD_DROPDOWN_EXPIRATION_YEAR, TEST_CARD_YEAR));
+        myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_DROPDOWN_EXPIRATION_MONTH, TEST_CARD_MONTHYEAR));
+       // myAccNewCardFields.add(new Field(Field.SELECT, ADD_CARD_DROPDOWN_EXPIRATION_YEAR, TEST_CARD_YEAR));
         myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_FIELD_BILLING_FIRST_NAME, TEST_FIRST_NAME));
         myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_FIELD_BILLING_LAST_NAME, TEST_LAST_NAME));
         myAccNewCardFields.add(new Field(Field.INPUT, ADD_CARD_FIELD_BILLING_STREET_ADDRESS1, WA_GUEST_STREET_1));

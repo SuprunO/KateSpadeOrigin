@@ -33,21 +33,11 @@
 
 package lcg.selenium.pages;
 
-import lcg.selenium.Field;
 import lcg.selenium.PageFactory;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Select;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
 
 /**
  * A class, which contains implemented actions and verifications, which can be performed on Checkout page
@@ -134,6 +124,11 @@ public class CheckoutOrderReviewPage extends PageFactory {
     public void verifyPlacingOrderLoadingMaskIsPresent() {
         logger.info("Verifying Placing Order Loading(indication that order is processing at present moment) is present.");
         waitForElementIsVisible("PLACING ORDER LOADING MASK DID NOT APPEAR AFTER 10 SECONDS", LOADING_MASK_PLACING_ORDER, 10);
+    }
+
+
+    public void verifyShippingAddressHeaderisPresent() {
+        Assert.assertEquals("SHIPPING ADDRESS", driver.findElement(By.cssSelector(".checkout-section-header")).getText());
     }
 
 }

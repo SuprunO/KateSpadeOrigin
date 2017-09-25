@@ -85,20 +85,22 @@ public abstract class PageFactory {
     public static final String CUSTOMER_PASSWORD = "testthis";
 
     /* Test credit card information */
+    public static final String TEST_CARD_NAME = "TestName";
     public static final String TEST_CARD_NUMBER = "4111111111111111";
 
     public static final String TEST_CARD_TYPE = "Visa";
-    public static final String TEST_CARD_MONTH = "01 - January";
-    public static final String TEST_CARD_YEAR = "2018";
+    public static final String TEST_CARD_MONTHYEAR = "1212";
+    public static final String TEST_CARD_CVV = "123";
 
     //Test Address information
-    public static final String WA_GUEST_STREET_1 = "111 N QUEEN ANNE AVE";
-    public static final String WA_GUEST_STREET_2 = "STE 200";
-    public static final String WA_GUEST_CITY = "Seattle";
-    public static final String WA_GUEST_STATE = "Washington";
+    public static final String WA_GUEST_STREET_1 = "666 Dundee Road";
+    public static final String WA_GUEST_STREET_2 = "666 Dundee Road";
+    public static final String WA_GUEST_CITY = "Northbrook";
+    public static final String WA_GUEST_STATE = "IL - Illinois";
     public static final String WA_GUEST_COUNTRY = "United States";
-    public static final String WA_GUEST_ZIP = "98109";
+    public static final String WA_GUEST_ZIP = "60062";
     public static final String WA_GUEST_PHONE = "555.555.5555";
+    public static final String WA_GUEST_EMAIL = "test1@speroteck.com";
 
 
 

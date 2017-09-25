@@ -57,7 +57,7 @@ public class ShoppingCartPage extends PageFactory {
     /* Shopping cart page Elements */
     public static final By LINK_REMOVE = By.linkText("Remove");
     public static final By CHECKBOX_GIFT_IN_ORDER = By.id("order-contains-gift");
-    public static final By BUTTON_CHECKOUT = By.xpath("//div[@class='totals']//button");
+    public static final By BUTTON_CHECKOUT = By.cssSelector(".button.mini-cart-link-cart");
     public static final By BUTTON_CHECKOUT_ADDONS = By.id("submit-addons");
     public static final By LOCATOR_EMPTY_CART_CONTENT = By.xpath("//div[@class='cart-empty']");
     public static final By LOCATOR_CART_CONTENT = By.xpath("//div[@class='cart']");
