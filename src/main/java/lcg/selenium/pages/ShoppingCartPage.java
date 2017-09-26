@@ -52,27 +52,69 @@ public class ShoppingCartPage extends PageFactory {
 
     public static final Logger logger = Logger.getLogger(ShoppingCartPage.class);
 
+    public ShoppingCartPage(WebDriver driver) {
+        super(driver);
+    }
+
+
     public static final String PAGE_SHOPPING_CART = "checkout/cart";
 
-    /* Shopping cart page Elements */
+    /** ---------------------------   START: LOCATORS   --------------------------- */
+
+    public static final By PROCEED_TO_CHECKOUT = By.xpath(".//div/fieldset/button");
+
+    /** ---------------------------   END: LOCATORS   --------------------------- */
+
+
+
+
+    /** ---------------------------   START: EXECUTION METHODS   --------------------------- */
+    public void clickProceedToCheckoutButton() {
+        waitForElementIsVisible(PROCEED_TO_CHECKOUT);
+        clickOnElement(PROCEED_TO_CHECKOUT, "Proceed To Checkout button");
+    }
+    /** ---------------------------   END: EXECUTION METHODS   --------------------------- */
+
+
+    /** ---------------------------   START: EXPECTED RESULTS   --------------------------- */
+
+
+    /** ---------------------------   END: EXPECTED RESULTS   --------------------------- */
+
+
+
+    /** ---------------------------   START: Verifications methods    --------------------------- */
+
+    /** ---------------------------   END: Verifications methods    --------------------------- */
+
+
+
+
+
+
+
+
+
+
+    /** ---------------------------   START: LOCATORS UNUSED   --------------------------- */
+
     public static final By LINK_REMOVE = By.linkText("Remove");
     public static final By CHECKBOX_GIFT_IN_ORDER = By.id("order-contains-gift");
-    public static final By BUTTON_CHECKOUT = By.cssSelector(".button.mini-cart-link-cart");
-    public static final By BUTTON_CHECKOUT_ADDONS = By.id("submit-addons");
+
     public static final By LOCATOR_EMPTY_CART_CONTENT = By.xpath("//div[@class='cart-empty']");
     public static final By LOCATOR_CART_CONTENT = By.xpath("//div[@class='cart']");
     public static final By FIELD_GIFT_CARD = By.name("giftcard_code");
     public static final By BUTTON_APPLY_GIFT_CARD = By.id("giftcard_code_button");
     public static final By SUCCESS_MESSAGE = By.xpath("//li[@class='success-msg']");
-    public static final By GRAND_TOTAL = By.xpath("//span[@class='grand-total']/span");
-    public static final By TEXT_SUBTOTAL = By.xpath("//span[@class='subtotal']/span");
-    public static final By LINK_UPDATE_SHOPPING_BAG = By.xpath("//button[@class='button btn-link btn-update']");
-    public static final By FIELD_PROMO_CODE = By.id("coupon_code");
-    public static final By BUTTON_APPLY_PROMO_CODE = By.id("coupon_code_button");
 
-    public ShoppingCartPage(WebDriver driver) {
-        super(driver);
-    }
+    public static final By TEXT_SUBTOTAL = By.xpath("//span[@class='subtotal']/span");
+
+    /** ---------------------------   END: LOCATORS UNUSED   --------------------------- */
+
+
+
+    /** ---------------------------   START: METHODS THAT CAN BE USEFUL   --------------------------- */
+
 
     /**
      * This method opens Shopping Cart Page.
@@ -92,6 +134,7 @@ public class ShoppingCartPage extends PageFactory {
         return driver.getCurrentUrl().equals(getStartURL() + PAGE_SHOPPING_CART);
     }
 
+
     /**
      * Verifies is Shopping cart empty or not, by presence of LOCATOR_EMPTY_CART_CONTENT block and returns "true" if empty.
      *
@@ -100,6 +143,7 @@ public class ShoppingCartPage extends PageFactory {
     public boolean isShoppingCartEmpty() {
         return isElementPresent(LOCATOR_EMPTY_CART_CONTENT);
     }
+
 
     /**
      * This method perform actions, which user need to do to delete all products from Shopping cart.
@@ -123,22 +167,7 @@ public class ShoppingCartPage extends PageFactory {
     /**
      * This method perform actions, which user need to do to get the Checkout page from Shopping cart page.
      */
-    public void clickCheckoutButton() {
-        logger.info("Clicking on checkout button on Shopping cart page");
-        waitForElementIsVisible(BUTTON_CHECKOUT);
-        clickOnElement(BUTTON_CHECKOUT, "CHECKOUT button");
-        logger.info("Waiting till pop-up with addons will open");
-        // there is no pop-up for ome products, so catch waiting exception and continue with printing message
-        try {
-            waitForElementIsVisible(BUTTON_CHECKOUT_ADDONS, 10);
-            logger.info("Clicking on checkout button in pop-up with addons");
-        } catch (Exception ex) {
-            logger.warn("No pop-up yet... There a some products without pop-up, so moving on");
-            return;     //If pop-up didn't appear no need for further actions in current method
-        }
-        clickOnElement(BUTTON_CHECKOUT_ADDONS, "Addons CHECKOUT button");
-        waitForElementNotVisible(BUTTON_CHECKOUT_ADDONS);
-    }
+
 
     /**
      * This method will apply specified Gift Card.
@@ -174,14 +203,5 @@ public class ShoppingCartPage extends PageFactory {
                 productName + ")]/../../../../td[@class='a-right cart-fifth']//input"), qty);
     }
 
-    /**
-     * This method will apply specified Promo Code.
-     *
-     * @param promoCode String value
-     */
-    public void applyPromoCode(String promoCode) {
-        fillInInput(FIELD_PROMO_CODE, promoCode);
-        clickOnElement(BUTTON_APPLY_PROMO_CODE, "Apply promo code");
-        waitForElementIsVisible(SUCCESS_MESSAGE);
-    }
+    /** ---------------------------   END: METHODS THAT CAN BE USEFUL   --------------------------- */
 }
