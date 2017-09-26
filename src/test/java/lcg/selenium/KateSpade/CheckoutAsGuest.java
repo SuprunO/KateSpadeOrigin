@@ -47,7 +47,6 @@ public class CheckoutAsGuest extends TestFactory {
      */
     @Test
     public void testGuestCanPlaceOrder() {
-        testCaseName = Thread.currentThread().getStackTrace()[1].getMethodName();
         log("Starting test.... " + testCaseName);
         log("Starting test: Guest Visitors have ability to place order");
         log("Test description: ");
@@ -58,13 +57,12 @@ public class CheckoutAsGuest extends TestFactory {
         log("@Given: I am on \"Shopping Bag\" page as Guest with random product in cart.");
         homePage().open();
         productDetailsPage().openById("PXRU8215");
-        productDetailsPage().clickButtonAddToCart();             // Change to "ClickOnAddToBagButton"
-        //       header().clickOnCartIcon();                            // Meaningless
+        productDetailsPage().clickButtonAddToCart();
         log("@Given step: PASSED!");
         log("Stating step: ");
         log("@When: I go to Checkout as Guest");
-        shoppingCartPage().clickCheckoutButton();                // ClickOnViewBagCheckoutButtonInMinicart
-        checkoutLoginPage().clickProceedToCheckoutButton();
+        header().clickCheckoutButtonInMiniCart();
+        shoppingCartPage().clickProceedToCheckoutButton();
         log("@When step: PASSED!");
         log("Stating step: ");
         log("@Then: I can fill all correct information and place order.");
@@ -72,7 +70,6 @@ public class CheckoutAsGuest extends TestFactory {
         checkoutShippingPage().fillShippingAddressForm("IL - Illinois");
         checkoutBillingPage().fillBillingCCForm();
         checkoutOrderReviewPage().verifyShippingAddressHeaderisPresent();
-
 
         log("@Then step: PASSED!");
     }

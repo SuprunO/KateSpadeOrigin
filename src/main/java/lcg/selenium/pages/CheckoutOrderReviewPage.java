@@ -48,6 +48,46 @@ public class CheckoutOrderReviewPage extends PageFactory {
 
     public Logger logger = Logger.getLogger(CheckoutOrderReviewPage.class);
 
+    public CheckoutOrderReviewPage(WebDriver driver) {
+        super(driver);
+    }
+
+    /** ---------------------------   START: LOCATORS   --------------------------- */
+
+
+    /** ---------------------------   END: LOCATORS   --------------------------- */
+
+
+    /** ---------------------------   START: EXECUTION METHODS   --------------------------- */
+
+
+    /** ---------------------------   END: EXECUTION METHODS   --------------------------- */
+
+
+
+    /** ---------------------------   START: EXPECTED RESULTS   --------------------------- */
+
+
+    /** ---------------------------   END: EXPECTED RESULTS   --------------------------- */
+
+
+
+
+
+
+    /** ---------------------------   START: Verifications methods    --------------------------- */
+    public void verifyShippingAddressHeaderisPresent() {
+        Assert.assertEquals("SHIPPING ADDRESS", driver.findElement(By.cssSelector(".checkout-section-header")).getText());
+    }
+
+    /** ---------------------------   END: Verifications methods    --------------------------- */
+
+
+
+
+
+    /** ---------------------------   START: LOCATORS UNUSED   --------------------------- */
+
     public static final By BUTTON_PLACE_ORDER_DISABLED = By.xpath("//button[@class='btn-cart btn-checkout pink-button disabled']");
     public static final By BUTTON_PLACE_ORDER = By.xpath("//button[@class='btn-cart btn-checkout pink-button']");
     public static final By LOADING_MASK_PLACING_ORDER = By.xpath("//div[@class='jcheckout-checkout-loading']");
@@ -70,6 +110,19 @@ public class CheckoutOrderReviewPage extends PageFactory {
     public static final By EDIT_CART_LINK_ON_CHECKOUT = By.className("edit-cart-link");
     public static final By TITLE_PROMO_CODE = By.className("promocode");
 
+    /** ---------------------------   END: LOCATORS UNUSED   --------------------------- */
+
+
+
+
+
+
+
+
+    /** ---------------------------   START: METHODS THAT CAN BE USEFUL   --------------------------- */
+
+
+
     private static final double DELTA = 1e-2;
 
     /*
@@ -78,9 +131,7 @@ public class CheckoutOrderReviewPage extends PageFactory {
     */
     private final static String[] COUNTRY_LIST = new String[]{"Canada", "United States", "U.S. Minor Outlying Islands", "U.S. Virgin Islands"};
 
-    public CheckoutOrderReviewPage(WebDriver driver) {
-        super(driver);
-    }
+
 
     /**
      * This method waits for "Place Order" button get disabled and enabled again and click it.
@@ -118,6 +169,7 @@ public class CheckoutOrderReviewPage extends PageFactory {
         }
     }
 
+
     /**
      * This method checks  Placing Order Loading(indication that order is processing at present moment) is present.
      */
@@ -126,9 +178,6 @@ public class CheckoutOrderReviewPage extends PageFactory {
         waitForElementIsVisible("PLACING ORDER LOADING MASK DID NOT APPEAR AFTER 10 SECONDS", LOADING_MASK_PLACING_ORDER, 10);
     }
 
-
-    public void verifyShippingAddressHeaderisPresent() {
-        Assert.assertEquals("SHIPPING ADDRESS", driver.findElement(By.cssSelector(".checkout-section-header")).getText());
-    }
+    /** ---------------------------   END: METHODS THAT CAN BE USEFUL   --------------------------- */
 
 }

@@ -54,9 +54,6 @@ public class HomePage extends PageFactory {
 
     private static final Logger logger = Logger.getLogger(TestFactory.class);
 
-    /* Home Page elements */
-    public static final String PATH_TO_BESTSELLERS_LIST = "//ul[contains(@class,'products-grid')]";
-
     public HomePage(WebDriver driver) {
         super(driver);
     }
@@ -71,5 +68,44 @@ public class HomePage extends PageFactory {
         assertEquals("HOME PAGE WAS NOT OPENED", getStartURL(), driver.getCurrentUrl());
         assertFalse("404 PAGE IS OPENED! BUT EXPECTED: " + getStartURL(), is404Page());
     }
+
+
+    /** ---------------------------   START: EXECUTION METHODS   --------------------------- */
+
+
+    /** ---------------------------   END: EXECUTION METHODS   --------------------------- */
+
+
+
+    /** ---------------------------   START: EXPECTED RESULTS   --------------------------- */
+
+
+    /** ---------------------------   END: EXPECTED RESULTS   --------------------------- */
+
+
+
+    /** ---------------------------   START: Verifications methods    --------------------------- */
+
+    /** ---------------------------   END: Verifications methods    --------------------------- */
+
+
+
+
+
+
+
+
+    /** ---------------------------   START: LOCATORS UNUSED   --------------------------- */
+    /* Home Page elements */
+    public static final String PATH_TO_BESTSELLERS_LIST = "//ul[contains(@class,'products-grid')]";
+
+    /** ---------------------------   END: LOCATORS UNUSED   --------------------------- */
+
+
+    /** ---------------------------   START: METHODS THAT CAN BE USEFUL   --------------------------- */
+
+
+    /** ---------------------------   END: METHODS THAT CAN BE USEFUL   --------------------------- */
+
 
 }

@@ -53,11 +53,68 @@ public class CheckoutBillingPage extends PageFactory {
 
     public Logger logger = Logger.getLogger(CheckoutBillingPage.class);
 
-    public static final By BUTTON_REVIEW_YOUR_ORDER = By.cssSelector(".continuecheckoutbutton.form-row.form-row-button>button");
+    public CheckoutBillingPage(WebDriver driver) {
+        super(driver);
+    }
 
-    /* Billing Address Step */
+                     /** ---------------------------   START: LOCATORS   --------------------------- */
+
+    public static final By BUTTON_REVIEW_YOUR_ORDER = By.cssSelector(".continuecheckoutbutton.form-row.form-row-button>button");
+    /* Make Billing Address as Shipping Locator */
     public static final String ID_BILLING_ADDRESS_SAME_AS_SHIPPING_CHECKBOX = ".form-row.sameshipping.label-inline.form-indent.notselect>label";
     public static final By CHECKBOX_BILLING_ADDRESS_SAME_AS_SHIPPING = By.cssSelector(ID_BILLING_ADDRESS_SAME_AS_SHIPPING_CHECKBOX);
+
+    /* Billing Credit Card(CC) Step */
+
+    public static final By FIELD_BILLING_CC_NAMEONCARD = By.cssSelector("#dwfrm_billing_paymentMethods_creditCard_owner");
+    public static final By FIELD_BILLING_CC_NUMBER = By.cssSelector("#dwfrm_billing_paymentMethods_creditCard_number");
+    public static final By FIELD_BILLING_CC_EXPIRATION_MONTHYEAR = By.cssSelector("#dwfrm_billing_paymentMethods_creditCard_expirationdate");
+    public static final By FIELD_BILLING_CC_CVV = By.cssSelector(".payment-method.payment-method-expanded:nth-child(3)>div:nth-child(7)>input");
+
+                      /** ---------------------------   END: LOCATORS   --------------------------- */
+
+
+                      /** ---------------------------   START: EXECUTION METHODS   --------------------------- */
+    /**
+     * Fills in Billing Credit Card Form
+     */
+    public void fillBillingCCForm() {
+        logger.info("Fill out Billing Credit Card Form");
+        waitForElementIsVisible(FIELD_BILLING_CC_NUMBER);
+        fillInInput(FIELD_BILLING_CC_NAMEONCARD, TEST_CARD_NAME);
+        fillInInput(FIELD_BILLING_CC_NUMBER, TEST_CARD_NUMBER);
+        fillInInput(FIELD_BILLING_CC_EXPIRATION_MONTHYEAR, TEST_CARD_MONTHYEAR);
+        fillInInput(FIELD_BILLING_CC_CVV, TEST_CARD_CVV);
+        clickOnElement(CHECKBOX_BILLING_ADDRESS_SAME_AS_SHIPPING, "same as shipping");
+        waitForElementIsVisible(BUTTON_REVIEW_YOUR_ORDER);
+        clickOnElement(BUTTON_REVIEW_YOUR_ORDER, "ReviewYourOrder");
+    }
+    /** ---------------------------   END: EXECUTION METHODS   --------------------------- */
+
+
+
+
+    /** ---------------------------   START: EXPECTED RESULTS   --------------------------- */
+
+
+    /** ---------------------------   END: EXPECTED RESULTS   --------------------------- */
+
+
+
+
+    /** ---------------------------   START: Verifications methods    --------------------------- */
+
+    /** ---------------------------   END: Verifications methods    --------------------------- */
+
+
+
+
+
+
+
+
+    /** ---------------------------   START: LOCATORS UNUSED   --------------------------- */
+      /* Billing Address Step */
     public static final By DROPDOWN_BILLING_INFO = By.id("billing-address-select");
     public static final By TEXT_BILLING_INFO_DISPLAYED_INFO = By.id("current-billing-customer-address");
     public static final By FORM_BILLING_INFO_NEW_ADDRESS = By.id("billing-new-address-form");
@@ -72,19 +129,68 @@ public class CheckoutBillingPage extends PageFactory {
     public static final By FIELD_BILLING_ADDRESS_TELEPHONE = By.id("billing:telephone");
 
     /* Billing Credit Card(CC) Step */
-//    public static final By DROPDOWN_BILLING_CC = By.id("tokens");
-    //   public static final By FORM_BILLING_CC_NEW_CARD = By.id("new_card_fields");
-//    public static final By CHECKBOX_BILLING_CC_SET_NEW_CC_AS_DEFAULT = By.id("set_as_default");
-    public static final By FIELD_BILLING_CC_NAMEONCARD = By.cssSelector("#dwfrm_billing_paymentMethods_creditCard_owner");
-    public static final By FIELD_BILLING_CC_NUMBER = By.cssSelector("#dwfrm_billing_paymentMethods_creditCard_number");
-    //public static final By DROPDOWN_BILLING_CC_TYPE = By.id("creditcard_cc_type");     // investigate usage! no such dropdown...
-    public static final By FIELD_BILLING_CC_EXPIRATION_MONTHYEAR = By.cssSelector("#dwfrm_billing_paymentMethods_creditCard_expirationdate");
-    public static final By FIELD_BILLING_CC_CVV = By.cssSelector(".payment-method.payment-method-expanded:nth-child(3)>div:nth-child(7)>input");
-    //  public static final By DROPDOWN_BILLING_CC_EXPIRATION_YEAR = By.id("creditcard_expiration_yr");
+    public static final By DROPDOWN_BILLING_CC_TYPE = By.id("creditcard_cc_type");     // investigate usage! no such dropdown...
+    public static final By DROPDOWN_BILLING_CC_EXPIRATION_YEAR = By.id("creditcard_expiration_yr");
+
+    /** ---------------------------   END: LOCATORS UNUSED   --------------------------- */
 
 
-    public CheckoutBillingPage(WebDriver driver) {
-        super(driver);
+
+
+
+
+
+
+
+
+
+    /** ---------------------------   START: METHODS THAT CAN BE USEFUL   --------------------------- */
+
+
+    /**
+     * Creates and returns Billing address fields to fill on checkout with values based on specified state name.
+     * Note: If argument is not recognized fields with default values will be returned
+     *
+     * @param stateName String "NEW_JERSEY"|"NEW_YORK"|"WASHINGTON"|"COLORADO"|any string
+     * @return ArrayList<Field> Fields set which is used in fillFieldsSet() method as argument
+     */
+    private ArrayList<Field> getBillingFieldSet(String stateName) {
+        ArrayList<Field> resultFieldSet = new ArrayList<Field>();
+        // create billing field sets for every declared state
+        resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_FIRST_NAME, TEST_FIRST_NAME));
+        resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_LAST_NAME, TEST_LAST_NAME));
+        if (stateName.equals("NEW_JERSEY")) {
+//
+        }
+        if (stateName.equals("WASHINGTON")) {
+            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, WA_GUEST_STREET_1));
+            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, WA_GUEST_STREET_2));
+            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, WA_GUEST_CITY));
+            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, WA_GUEST_STATE));
+            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, WA_GUEST_ZIP));
+            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, WA_GUEST_COUNTRY));
+            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, WA_GUEST_PHONE));
+
+        } else if (stateName.equals("COLORADO")) {
+//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, COL_GUEST_STREET_1));
+//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, COL_GUEST_STREET_2));
+//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, COL_GUEST_CITY));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, COL_GUEST_STATE));
+//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, COL_GUEST_ZIP));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, COL_GUEST_COUNTRY));
+//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, COL_GUEST_PHONE));
+        }
+        return resultFieldSet;
+    }
+
+
+    /**
+     * Creates and returns Billing address fields to fill on checkout with default values.
+     *
+     * @return ArrayList<Field> Fields set which is used in fillFieldsSet() method as argument
+     */
+    private ArrayList<Field> getBillingFieldSet() {
+        return getBillingFieldSet("");
     }
 
 
@@ -122,103 +228,4 @@ public class CheckoutBillingPage extends PageFactory {
         logger.info("Fill out Billing Address Form");
         fillFieldsSet(billingAddressFields);
     }
-
-    /**
-     * fills in Billing Credit Card Form
-     */
-    public void fillBillingCCForm() {
-        logger.info("Fill out Billing Credit Card Form");
-        waitForElementIsVisible(FIELD_BILLING_CC_NUMBER);
-        fillInInput(FIELD_BILLING_CC_NAMEONCARD, TEST_CARD_NAME);
-        fillInInput(FIELD_BILLING_CC_NUMBER, TEST_CARD_NUMBER);
-        fillInInput(FIELD_BILLING_CC_EXPIRATION_MONTHYEAR, TEST_CARD_MONTHYEAR);
-        fillInInput(FIELD_BILLING_CC_CVV, TEST_CARD_CVV);
-        clickOnElement(CHECKBOX_BILLING_ADDRESS_SAME_AS_SHIPPING , "same as shipping");
-        waitForElementIsVisible(BUTTON_REVIEW_YOUR_ORDER);
-        clickOnElement(BUTTON_REVIEW_YOUR_ORDER, "ReviewYourOrder");
-    }
-
-    /**
-     * Checking the
-     */
-
-
-
-
-
-
-    /**
-     * Creates and returns Billing address fields to fill on checkout with default values.
-     *
-     * @return ArrayList<Field> Fields set which is used in fillFieldsSet() method as argument
-     */
-    private ArrayList<Field> getBillingFieldSet() {
-        return getBillingFieldSet("");
-    }
-
-    /**
-     * Creates and returns Billing address fields to fill on checkout with values based on specified state name.
-     * Note: If argument is not recognized fields with default values will be returned
-     *
-     * @param stateName String "NEW_JERSEY"|"NEW_YORK"|"WASHINGTON"|"COLORADO"|any string
-     * @return ArrayList<Field> Fields set which is used in fillFieldsSet() method as argument
-     */
-    private ArrayList<Field> getBillingFieldSet(String stateName) {
-        ArrayList<Field> resultFieldSet = new ArrayList<Field>();
-        // create billing field sets for every declared state
-        resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_FIRST_NAME, TEST_FIRST_NAME));
-        resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_LAST_NAME, TEST_LAST_NAME));
-        if (stateName.equals("NEW_JERSEY")) {
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, NJ_GUEST_STREET_1));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, NJ_GUEST_STREET_2));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, NJ_GUEST_CITY));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, NJ_GUEST_STATE));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, NJ_GUEST_ZIP));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, NJ_GUEST_COUNTRY));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, NJ_GUEST_PHONE));
-        } else if (stateName.equals("NEW_YORK")) {
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, NY_GUEST_STREET_1));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, NY_GUEST_STREET_2));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, NY_GUEST_CITY));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, NY_GUEST_STATE));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, NY_GUEST_ZIP));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, NY_GUEST_COUNTRY));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, NY_GUEST_PHONE));
-        } else if (stateName.equals("WASHINGTON")) {
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, WA_GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, WA_GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, WA_GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, WA_GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, WA_GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, WA_GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, WA_GUEST_PHONE));
-
-        } else if (stateName.equals("COLORADO")) {
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, COL_GUEST_STREET_1));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, COL_GUEST_STREET_2));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, COL_GUEST_CITY));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, COL_GUEST_STATE));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, COL_GUEST_ZIP));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, COL_GUEST_COUNTRY));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, COL_GUEST_PHONE));
-        } else if (stateName.equals("OHIO")) {
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, OH_GUEST_STREET_1));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, OH_GUEST_STREET_2));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, OH_GUEST_CITY));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, OH_GUEST_STATE));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, OH_GUEST_ZIP));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, OH_GUEST_COUNTRY));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, OH_GUEST_PHONE));
-        } else {
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_1, GUEST_STREET_1));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_STREET_2, GUEST_STREET_2));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_CITY, GUEST_CITY));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_STATE, GUEST_STATE));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_ZIP_CODE, GUEST_ZIP));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_BILLING_ADDRESS_COUNTRY, GUEST_COUNTRY));
-//            resultFieldSet.add(new Field("input", FIELD_BILLING_ADDRESS_TELEPHONE, GUEST_PHONE));
-        }
-        return resultFieldSet;
-    }
-
 }

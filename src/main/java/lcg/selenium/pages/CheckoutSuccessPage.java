@@ -51,13 +51,49 @@ public class CheckoutSuccessPage extends PageFactory {
 
     public Logger logger = Logger.getLogger(CheckoutSuccessPage.class);
 
-    /* Order Summary Block */
-    public static final String PAGE_ORDER_SUCCESS = "ODe";
-
 
     public CheckoutSuccessPage(WebDriver driver) {
         super(driver);
     }
+
+    /** ---------------------------   START: LOCATORS   --------------------------- */
+    
+    /* Order Summary Block */
+    public static final String PAGE_ORDER_SUCCESS = "ODe";
+
+    /** ---------------------------   END: LOCATORS   --------------------------- */
+
+
+
+
+    /** ---------------------------   START: EXECUTION METHODS   --------------------------- */
+
+
+    /** ---------------------------   END: EXECUTION METHODS   --------------------------- */
+
+
+
+
+
+    /** ---------------------------   START: EXPECTED RESULTS   --------------------------- */
+
+
+    /** ---------------------------   END: EXPECTED RESULTS   --------------------------- */
+
+
+
+
+
+    /** ---------------------------   START: VERIFICATION METHODS   --------------------------- */
+
+
+    /** ---------------------------   END: VERIFICATION METHODS   --------------------------- */
+
+
+
+
+    /** ---------------------------   START: METHODS THAT CAN BE USEFUL   --------------------------- */
+
 
     /**
      * Verifies that current page is Order Success Page and returns "true" if so.
@@ -68,5 +104,5 @@ public class CheckoutSuccessPage extends PageFactory {
         return driver.getCurrentUrl().equals(getStartURL() + PAGE_ORDER_SUCCESS);
     }
 
-
+    /** ---------------------------   END: METHODS THAT CAN BE USEFUL   --------------------------- */
 }

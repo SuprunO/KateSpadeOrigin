@@ -102,7 +102,7 @@ public abstract class PageFactory {
     public static final String WA_GUEST_PHONE = "555.555.5555";
     public static final String WA_GUEST_EMAIL = "test1@speroteck.com";
 
-
+    public static final By QUICK_ACCESS_ACCOUNT = By.id("quick-access-account");
 
     /**
      * Constructor

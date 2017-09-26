@@ -59,14 +59,11 @@ public class CheckoutShippingPage extends PageFactory {
 
     public Logger logger = Logger.getLogger(CheckoutShippingPage.class);
 
-    public static final String PAGE_CHECKOUT = "checkout/onepage/";
-    public static final By WELCOME_ELEMENT = By.id("customer-welcome");
-    public static final By BUTTON_PLACE_ORDER_DISABLED = By.xpath("//button[@class='btn-cart btn-checkout pink-button disabled']");
-    public static final By BUTTON_PLACE_ORDER = By.xpath("//button[@class='btn-cart btn-checkout pink-button']");
-    public static final By LOADING_MASK_PLACING_ORDER = By.xpath("//div[@class='jcheckout-checkout-loading']");
-    public static final By LOADING_MASK_LOADING_STEP_DATA = By.xpath("//div[@id='checkout-step-shipping_method']/div[@class='step-loading']");
-    public static final By LINK_TERMS_AND_CONDITIONS = By.xpath("//a[contains(text(), 'Terms & Conditions')]");
-    public static final By LINK_PRIVACY_POLICY = By.xpath("//a[@name='trustlink']");
+    public CheckoutShippingPage(WebDriver driver) {
+        super(driver);
+    }
+
+    /** ---------------------------   START: LOCATORS   --------------------------- */
 
     /* Shipping Step */
     public static final By BLOCK_SHIPPING_STEP = By.id("checkout-step-shipping");
@@ -83,6 +80,99 @@ public class CheckoutShippingPage extends PageFactory {
     public static final By FIELD_SHIPPING_ADDRESS_ZIP_CODE = By.cssSelector("#dwfrm_singleshipping_shippingAddress_addressFields_zip");
     public static final By FIELD_SHIPPING_ADDRESS_TELEPHONE = By.cssSelector("#dwfrm_singleshipping_shippingAddress_addressFields_phone");
     public static final By FIELD_SHIPPING_ADDRESS_EMAIL = By.cssSelector("#dwfrm_singleshipping_shippingAddress_addressFields_email");
+
+
+    /** ---------------------------   END: LOCATORS   --------------------------- */
+
+
+
+    /** ---------------------------   START: EXECUTION METHODS   --------------------------- */
+
+    /**
+     * Fills in Shipping Address Form with values based on specified state name.
+     * Note: If argument is not recognized fills in form with default values.
+     *
+     * @param stateName String "NEW_JERSEY"|"NEW_YORK"|"WASHINGTON"|"COLORADO"|"OHIO"|any string
+     */
+    public void fillShippingAddressForm(String stateName) {
+        // Get all fields and dropdowns to fill by specified state
+        ArrayList<Field> shippingAddressFields = getShippingFieldSet(stateName);
+        assertThat("FIELD SET IS BLANK!", shippingAddressFields.size(), not(0));
+        logger.info("Fill out Shipping Address Form");
+        fillFieldsSet(shippingAddressFields);
+        //   checkCheckboxBillingSameAsShipping();
+        clickOnElement(CONTINUE_TO_PAYMENT, "ContinueToPayment"); //ClickOnConinueToPaymentButton
+    }
+
+
+    /**
+     * Creates and returns Shipping address fields to fill on checkout with values based on specified state name.
+     * Note: If argument is not recognized fields with default values will be returned
+     *
+     * @param stateName String "NEW_JERSEY"|"NEW_YORK"|"WASHINGTON"|"COLORADO"|any string
+     * @return ArrayList<Field> Fields set which is used in fillFieldsSet() method as argument
+     */
+    private ArrayList<Field> getShippingFieldSet(String stateName) {
+        ArrayList<Field> resultFieldSet = new ArrayList<Field>();
+        // create shipping field sets for every declared state
+        resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_FIRST_NAME, TEST_FIRST_NAME));
+        resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_LAST_NAME, TEST_LAST_NAME));
+      if (stateName.equals("IL - Illinois")) {
+            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, WA_GUEST_STREET_1));
+            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, WA_GUEST_STREET_2));
+            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, WA_GUEST_CITY));
+            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, WA_GUEST_STATE));
+            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, WA_GUEST_ZIP));
+            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, WA_GUEST_COUNTRY));
+            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, WA_GUEST_PHONE));
+            resultFieldSet.add(new Field("input",FIELD_SHIPPING_ADDRESS_EMAIL,WA_GUEST_EMAIL ));
+
+        } else if (stateName.equals("COLORADO")) {
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, COL_GUEST_STREET_1));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, COL_GUEST_STREET_2));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, COL_GUEST_CITY));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, COL_GUEST_STATE));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, COL_GUEST_ZIP));
+//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, COL_GUEST_COUNTRY));
+//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, COL_GUEST_PHONE));
+        }
+        return resultFieldSet;
+    }
+    /** ---------------------------   END: EXECUTION METHODS   --------------------------- */
+
+
+
+
+    /** ---------------------------   START: EXPECTED RESULTS   --------------------------- */
+
+
+    /** ---------------------------   END: EXPECTED RESULTS   --------------------------- */
+
+
+
+
+
+
+
+
+
+
+
+
+    /** ---------------------------   START: LOCATORS UNUSED   --------------------------- */
+
+
+
+    public static final String PAGE_CHECKOUT = "checkout/onepage/";
+    public static final By WELCOME_ELEMENT = By.id("customer-welcome");
+    public static final By BUTTON_PLACE_ORDER_DISABLED = By.xpath("//button[@class='btn-cart btn-checkout pink-button disabled']");
+    public static final By BUTTON_PLACE_ORDER = By.xpath("//button[@class='btn-cart btn-checkout pink-button']");
+    public static final By LOADING_MASK_PLACING_ORDER = By.xpath("//div[@class='jcheckout-checkout-loading']");
+    public static final By LOADING_MASK_LOADING_STEP_DATA = By.xpath("//div[@id='checkout-step-shipping_method']/div[@class='step-loading']");
+    public static final By LINK_TERMS_AND_CONDITIONS = By.xpath("//a[contains(text(), 'Terms & Conditions')]");
+    public static final By LINK_PRIVACY_POLICY = By.xpath("//a[@name='trustlink']");
+
+
     /* Billing Address Step */
     public static final String ID_BILLING_ADDRESS_SAME_AS_SHIPPING_CHECKBOX = ".useaddress-row.shipping-addr-use-as-billing>div>label>span";
     public static final By CHECKBOX_BILLING_ADDRESS_SAME_AS_SHIPPING = By.cssSelector(ID_BILLING_ADDRESS_SAME_AS_SHIPPING_CHECKBOX);
@@ -139,15 +229,20 @@ public class CheckoutShippingPage extends PageFactory {
 
     private static final double DELTA = 1e-2;
 
+    /** ---------------------------   END: LOCATORS UNUSED   --------------------------- */
+
+
+
+    /** ---------------------------   START: METHODS THAT CAN BE USEFUL   --------------------------- */
+
+
     /*
     * expected list of options in the country dropdown
     * see testCountryDropDown method in this class
     */
     private final static String[] COUNTRY_LIST = new String[]{"Canada", "United States", "U.S. Minor Outlying Islands", "U.S. Virgin Islands"};
 
-    public CheckoutShippingPage(WebDriver driver) {
-        super(driver);
-    }
+
 
     /**
      * This method will open Checkout page entering url into the address field.
@@ -360,21 +455,7 @@ public class CheckoutShippingPage extends PageFactory {
         fillShippingAddressForm("");
     }
 
-    /**
-     * Fills in Shipping Address Form with values based on specified state name.
-     * Note: If argument is not recognized fills in form with default values.
-     *
-     * @param stateName String "NEW_JERSEY"|"NEW_YORK"|"WASHINGTON"|"COLORADO"|"OHIO"|any string
-     */
-    public void fillShippingAddressForm(String stateName) {
-        // Get all fields and dropdowns to fill by specified state
-        ArrayList<Field> shippingAddressFields = getShippingFieldSet(stateName);
-        assertThat("FIELD SET IS BLANK!", shippingAddressFields.size(), not(0));
-        logger.info("Fill out Shipping Address Form");
-        fillFieldsSet(shippingAddressFields);
-     //   checkCheckboxBillingSameAsShipping();
-        clickOnElement(CONTINUE_TO_PAYMENT, "ContinueToPayment"); //ClickOnConinueToPaymentButton
-}
+
 
     /**
      * fills in Billing Credit Card Form
@@ -396,71 +477,6 @@ public class CheckoutShippingPage extends PageFactory {
         return getShippingFieldSet("");
     }
 
-    /**
-     * Creates and returns Shipping address fields to fill on checkout with values based on specified state name.
-     * Note: If argument is not recognized fields with default values will be returned
-     *
-     * @param stateName String "NEW_JERSEY"|"NEW_YORK"|"WASHINGTON"|"COLORADO"|any string
-     * @return ArrayList<Field> Fields set which is used in fillFieldsSet() method as argument
-     */
-    private ArrayList<Field> getShippingFieldSet(String stateName) {
-        ArrayList<Field> resultFieldSet = new ArrayList<Field>();
-        // create shipping field sets for every declared state
-        resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_FIRST_NAME, TEST_FIRST_NAME));
-        resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_LAST_NAME, TEST_LAST_NAME));
-        if (stateName.equals("NEW JERSEY")) {
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, NJ_GUEST_STREET_1));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, NJ_GUEST_STREET_2));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, NJ_GUEST_CITY));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, NJ_GUEST_STATE));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, NJ_GUEST_ZIP));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, NJ_GUEST_COUNTRY));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, NJ_GUEST_PHONE));
-        } else if (stateName.equals("NEW YORK")) {
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, NY_GUEST_STREET_1));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, NY_GUEST_STREET_2));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, NY_GUEST_CITY));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, NY_GUEST_STATE));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, NY_GUEST_ZIP));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, NY_GUEST_COUNTRY));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, NY_GUEST_PHONE));
-        } else if (stateName.equals("IL - Illinois")) {
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, WA_GUEST_STREET_1));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, WA_GUEST_STREET_2));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, WA_GUEST_CITY));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, WA_GUEST_STATE));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, WA_GUEST_ZIP));
-            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, WA_GUEST_COUNTRY));
-            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, WA_GUEST_PHONE));
-            resultFieldSet.add(new Field("input",FIELD_SHIPPING_ADDRESS_EMAIL,WA_GUEST_EMAIL ));
-
-        } else if (stateName.equals("COLORADO")) {
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, COL_GUEST_STREET_1));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, COL_GUEST_STREET_2));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, COL_GUEST_CITY));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, COL_GUEST_STATE));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, COL_GUEST_ZIP));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, COL_GUEST_COUNTRY));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, COL_GUEST_PHONE));
-        } else if (stateName.equals("OHIO")) {
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, OH_GUEST_STREET_1));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, OH_GUEST_STREET_2));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, OH_GUEST_CITY));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, OH_GUEST_STATE));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, OH_GUEST_ZIP));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, OH_GUEST_COUNTRY));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, OH_GUEST_PHONE));
-        } else {
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_1, GUEST_STREET_1));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_STREET_2, GUEST_STREET_2));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_CITY, GUEST_CITY));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_STATE, GUEST_STATE));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_ZIP_CODE, GUEST_ZIP));
-//            resultFieldSet.add(new Field("dropdown", DROPDOWN_SHIPPING_ADDRESS_COUNTRY, GUEST_COUNTRY));
-//            resultFieldSet.add(new Field("input", FIELD_SHIPPING_ADDRESS_TELEPHONE, GUEST_PHONE));
-        }
-        return resultFieldSet;
-    }
 
     /**
      * Gets Subtotal value in Totals sections and return it
@@ -783,4 +799,6 @@ public class CheckoutShippingPage extends PageFactory {
 //        }
 //        return false;
     }
+
+    /** ---------------------------   START: METHODS THAT CAN BE USEFUL   --------------------------- */
 }

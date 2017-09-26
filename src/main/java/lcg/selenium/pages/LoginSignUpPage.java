@@ -55,6 +55,45 @@ public class LoginSignUpPage extends PageFactory {
 
     private static final Logger logger = Logger.getLogger(LoginSignUpPage.class);
 
+    public LoginSignUpPage(WebDriver driver) {
+        super(driver);
+    }
+
+    /** ---------------------------   START: LOCATORS   --------------------------- */
+
+    /** ---------------------------   END: LOCATORS   --------------------------- */
+
+
+    /** ---------------------------   START: EXECUTION METHODS   --------------------------- */
+
+
+    /** ---------------------------   END: EXECUTION METHODS   --------------------------- */
+
+
+    /** ---------------------------   START: EXPECTED RESULTS   --------------------------- */
+
+
+    /** ---------------------------   END: EXPECTED RESULTS   --------------------------- */
+
+
+
+    /** ---------------------------   START: Verifications methods    --------------------------- */
+
+
+    /** ---------------------------   END: Verifications methods    --------------------------- */
+
+
+
+
+
+
+
+
+
+
+    /** ---------------------------   START: LOCATORS UNUSED   --------------------------- */
+
+
     /* Facebook locators */
     public static final By FIELD_EMAIL_FACEBOOK = By.id("email");
     public static final By FIELD_PASSWORD_FACEBOOK = By.id("pass");
@@ -75,9 +114,14 @@ public class LoginSignUpPage extends PageFactory {
     public static final By BLOCK_SUCCESS_MSG = By.xpath("//li[@class='success-msg']");
     public static final String PAGE_LOGIN_SIGN_UP = "customer/account/login";
 
-    public LoginSignUpPage(WebDriver driver) {
-        super(driver);
-    }
+
+    /** ---------------------------   END: LOCATORS UNUSED   --------------------------- */
+
+
+
+    /** ---------------------------   START: METHODS THAT CAN BE USEFUL   --------------------------- */
+
+
 
     /**
      * This method will open Login/Sign Up page.
@@ -174,5 +218,7 @@ public class LoginSignUpPage extends PageFactory {
         createAccountIfNotExist(randomUserEmail, CUSTOMER_PASSWORD);
         return randomUserEmail;
     }
+
+    /** ---------------------------   END: METHODS THAT CAN BE USEFUL   --------------------------- */
 
 }

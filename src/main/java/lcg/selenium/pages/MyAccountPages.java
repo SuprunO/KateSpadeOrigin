@@ -57,6 +57,40 @@ public class MyAccountPages extends PageFactory{
 
     private static final Logger logger = Logger.getLogger(MyAccountPages.class);
 
+    public MyAccountPages(WebDriver driver) {
+        super(driver);
+    }
+
+
+    /** ---------------------------   START: EXECUTION METHODS   --------------------------- */
+
+
+    /** ---------------------------   END: EXECUTION METHODS   --------------------------- */
+
+
+
+
+
+    /** ---------------------------   START: EXPECTED RESULTS   --------------------------- */
+
+
+    /** ---------------------------   END: EXPECTED RESULTS   --------------------------- */
+
+
+
+
+
+
+    /** ---------------------------   START: Verifications methods    --------------------------- */
+
+    /** ---------------------------   END: Verifications methods    --------------------------- */
+
+
+
+
+
+    /** ---------------------------   START: LOCATORS UNUSED   --------------------------- */
+
     public static final String PAGE_REGISTRATION_SUCCESS = "/account/index/";
     public static final By SUCCESS_MESSAGE = By.xpath("//li[@class='success-msg']");
 
@@ -200,9 +234,12 @@ public class MyAccountPages extends PageFactory{
     public static final By DROPDOWN_SEND_TO_FRIEND_COUNTRY = By.id("country");
     public static final By FIELD_SEND_TO_FRIEND_PHONE = By.id("telephone");
 
-   public MyAccountPages(WebDriver driver) {
-        super(driver);
-    }
+    /** ---------------------------   END: LOCATORS UNUSED   --------------------------- */
+
+
+
+    /** ---------------------------   START: METHODS THAT CAN BE USEFUL   --------------------------- */
+
 
     /**
      * This method will open My Account page, My account information section.
@@ -449,5 +486,7 @@ public class MyAccountPages extends PageFactory{
             throw new TestFrameworkRuntimeException("COULD NOT FIND ELEMENT: LINK FOR UPDATE AN ADDRESS");
         }
     }
+
+    /** ---------------------------   END: METHODS THAT CAN BE USEFUL   --------------------------- */
 
 }

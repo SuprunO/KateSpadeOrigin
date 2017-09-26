@@ -46,6 +46,11 @@ public class Footer extends PageFactory {
 
     private static final Logger logger = Logger.getLogger(Footer.class);
 
+    public Footer(WebDriver driver) {
+        super(driver);
+    }
+
+    /** ---------------------------   START: LOCATORS   --------------------------- */
     /* Footer Elements */
     public static final By LINK_CONTACT_US = By.xpath("//div[@id='footer-links']/ul/li/a[contains(text(),'Contact Us')]");
     public static final By LINK_SHIPPING_AND_DELIVERY = By.xpath("//div[@id='footer-links']/ul/li/a[contains(text(),'Shipping & Delivery')]");
@@ -60,12 +65,37 @@ public class Footer extends PageFactory {
     public static final By LINK_CAREERS = By.xpath("//ul[@id='navfooter']//a/span[contains(text(),'Careers')]");
     public static final By LINK_PRESS = By.xpath("//ul[@id='navfooter']//a/span[contains(text(),'Press')]");
     public static final By LINK_LOCATIONS = By.xpath("//ul[@id='navfooter']//a/span[contains(text(),'Locations')]");
+    /** ---------------------------   END: LOCATORS   --------------------------- */
 
-    public Footer(WebDriver driver) {
-        super(driver);
-    }
+    /** ---------------------------   START: EXECUTION METHODS   --------------------------- */
 
 
+    /** ---------------------------   END: EXECUTION METHODS   --------------------------- */
+
+
+
+    /** ---------------------------   START: EXPECTED RESULTS   --------------------------- */
+
+
+    /** ---------------------------   END: EXPECTED RESULTS   --------------------------- */
+
+
+    /** ---------------------------   START: VERIFICATION METHODS   --------------------------- */
+
+
+    /** ---------------------------   END: VERIFICATION METHODS   --------------------------- */
+
+
+
+
+
+
+
+
+
+
+
+    /** ---------------------------   START: METHODS THAT CAN BE USEFUL   --------------------------- */
     /**
      * use this function to find and click a link in the customer service section in footer
      * @param item  "String" name of link

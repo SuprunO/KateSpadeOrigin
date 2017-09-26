@@ -35,12 +35,7 @@ package lcg.selenium.pages;
 import lcg.selenium.PageFactory;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * A class, which contains implemented actions and verifications, which can be performed for Global elements(header)
@@ -51,80 +46,68 @@ public class Header extends PageFactory {
 
     private static final Logger logger = Logger.getLogger(Header.class);
 
-    /* Header Elements */
-    public static final By LOGO = By.xpath("//a[@class='logo']");
-    public static final By FIELD_SEARCH = By.id("search");
-    public static final By ICON_SHOPPING_CART = By.cssSelector(".minicart-icon");
-    public static final By QUICK_ACCESS_ACCOUNT = By.id("quick-access-account");
-
-    public static final By POPUP_MINICART = By.xpath("//div[@class='mini-cart-content']");
-
-    /* Header: Top Navigation Menu */
-    public static final By TOP_NAV_MENU_SHOP = By.xpath("//ul[@id='nav']/li/a/span[contains(text(),'Shop')]");
-    public static final String TOP_NAV_MENU_TITLE = "//ul[@id='nav']/li/a/span[contains(text(),'";
-    public static final String TOP_NAV_MENU_ITEM = "//ul[@id='nav']/li/ul/li/a/span[contains(text(),'";
-
     public Header(WebDriver driver) {
         super(driver);
     }
 
+    /** ---------------------------   START: LOCATORS   --------------------------- */
+    public static final By ICON_SHOPPING_CART = By.cssSelector(".minicart-icon");
+
+    public static final By POPUP_MINICART = By.xpath("//div[@class='mini-cart-content']");
+    public static final By BUTTON_CHECKOUT = By.cssSelector(".button.mini-cart-link-cart");
+    /** ---------------------------   END: LOCATORS   --------------------------- */
+
+
+
+    /** ---------------------------   START: EXECUTION METHODS   --------------------------- */
     /**
-     * Method enters specified text into the search field in the header and press ENTER key to run search
+     * Click on Checkout Button InMini Cart to get to the Shopping cart page.
      */
-    public void searchByText(String searchPhrase) {
-        logger.info("Entering text: " + searchPhrase + "into search field in header");
-        driver.findElement(FIELD_SEARCH).sendKeys(searchPhrase);
-        Actions action = new Actions(driver);
-        logger.info("Running search by pressing ENTER button");
-        action.sendKeys(Keys.ENTER).build().perform();
+    public void clickCheckoutButtonInMiniCart() {
+        logger.info("Clicking on checkout button on Shopping cart page");
+        waitForElementIsVisible(POPUP_MINICART, 120);
+        waitForElementIsVisible(BUTTON_CHECKOUT);
+        clickOnElement(BUTTON_CHECKOUT, "CHECKOUT button");
+        logger.info("Waiting till pop-up with addons will open");
     }
 
-    /**
-     * Check if a user is logged in
-     *
-     * @return Boolean
-     */
-    public boolean isLoggedIn() {
-        //make sure the quick access menu exists
-        if (!isElementPresent(QUICK_ACCESS_ACCOUNT)) {
-            return false;
-        }
-        //check quick access menu to signal logged in
-        return driver.findElement(QUICK_ACCESS_ACCOUNT).isDisplayed();
-    }
+    /** ---------------------------   END: EXECUTION METHODS   --------------------------- */
+
+
+
+
+
+    /** ---------------------------   START: EXPECTED RESULTS   --------------------------- */
+
+
+    /** ---------------------------   END: EXPECTED RESULTS   --------------------------- */
+
+
+
+
+
+    /** ---------------------------   START: VERIFICATION METHODS   --------------------------- */
+
+
+    /** ---------------------------   END: VERIFICATION METHODS   --------------------------- */
+
+
+
+
+
+
+
+
+
+    /** ---------------------------   START: METHODS THAT CAN BE USEFUL   --------------------------- */
 
     /**
-     * This method perform actions, which user need to do to get the Shopping cart page from any page, which has Cart icon in header .
+     * Click on Cart Icon located in Header to get the Shopping cart page (if needed).
      */
     public void clickOnCartIcon() {
+        waitForElementIsVisible("SHOPPING CART CONTENT DID NOT APPEAR AFTER 10 SECONDS OF WAITING", ShoppingCartPage.LOCATOR_CART_CONTENT, 10);
         clickOnElement(ICON_SHOPPING_CART, "Shopping cart icon");
-        //waitForElementIsVisible("SHOPPING CART CONTENT DID NOT APPEAR AFTER 10 SECONDS OF WAITING",ShoppingCartPage.LOCATOR_CART_CONTENT, 10);
     }
 
-    /**
-     * Use this function to click an item of the top nav menu
-     * @param menuTitle - text of the parent menu to hover over
-     * @param menuItem - text of the item to click within the parent menu
-     */
-    public void findAndClickNavMenuItem(String menuTitle, String menuItem) {
-        //make sure the requested menu exist
-        assertTrue("MENU TITLE " + menuTitle + " IS NOT PRESENT ON PAGE",isElementPresent(By.xpath(TOP_NAV_MENU_TITLE + menuTitle + "')]")));
-        //make sure the requested menu item exists
-        assertTrue("MENU ITEM " + menuItem + " IS NOT PRESENT ON PAGE",isElementPresent(By.xpath(TOP_NAV_MENU_ITEM + menuItem + "')]")));
-        //get the requested menu and item
-        final WebElement weMenu = driver.findElement(By.xpath(TOP_NAV_MENU_TITLE + menuTitle + "')]"));
-        WebElement weItem = driver.findElement(By.xpath(TOP_NAV_MENU_ITEM + menuItem + "')]"));
-        //make sure the parent menu contains the requested item
-        assertTrue("MENU TITLE " + menuTitle + " DO NOT CONTAIN " + menuItem + " MENU ITEM",weMenu.equals(weItem.findElement(By.xpath("../../../../a/span"))));
-        //NAVIGATE TO THE MENU ITEM
-        driver.navigate().to(weItem.findElement(By.xpath("..")).getAttribute("href"));
-    }
-
-    /**
-     * This function will return true if Logo in header is displayed
-     * @return boolean
-     */
-    public boolean isLogoDisplayed() {
-        return driver.findElement(LOGO).isDisplayed();
-    }
+    /** ---------------------------   END: METHODS THAT CAN BE USEFUL   --------------------------- */
 }

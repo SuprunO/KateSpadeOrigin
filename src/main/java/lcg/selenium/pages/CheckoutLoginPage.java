@@ -47,35 +47,61 @@ public class CheckoutLoginPage extends PageFactory {
 
     public Logger logger = Logger.getLogger(CheckoutLoginPage.class);
 
-    public static final By LINK_TERMS_AND_CONDITIONS = By.xpath("//a[contains(text(), 'Terms & Conditions')]");
-    public static final By LINK_PRIVACY_POLICY = By.xpath("//a[@name='trustlink']");
-
-  //  public static final By BUTTON_CREATE_ACCOUNT = By.id("co-registration-form");
-    public static final By PROCEED_TO_CHECKOUT = By.xpath(".//div/fieldset/button");
-    public static final By BUTTON_CONTINUE_AS_GUEST = By.cssSelector(".form-row.form-row-button:first-child");
-
-   //FOR REGISTERED USER
-    public static final By FIELD_LOGIN_FORM_CHECKOUT_EMAIL = By.id("login-email");
-    public static final By FIELD_LOGIN_FORM_CHECKOUT_PASSWORD = By.id("login-password");
-    public static final By BUTTON_LOGIN_FORM_CHECKOUT_LOGIN = By.id("jcheckout-login-button");
-
     public CheckoutLoginPage(WebDriver driver) {
         super(driver);
     }
 
+    /** ---------------------------   START: LOCATORS   --------------------------- */
 
-    public void clickProceedToCheckoutButton() {
-        waitForElementIsVisible(PROCEED_TO_CHECKOUT);
-        clickOnElement(PROCEED_TO_CHECKOUT, "Proceed To Checkout button");
-    }
+    //FOR GUEST
 
+    public static final By BUTTON_CONTINUE_AS_GUEST = By.cssSelector(".form-row.form-row-button:first-child");
+
+
+    /** ---------------------------   END: LOCATORS   --------------------------- */
+
+
+
+    /** ---------------------------   START: EXECUTION METHODS   --------------------------- */
     public void clickButtonContinueAsGuest() {
         waitForElementIsVisible(BUTTON_CONTINUE_AS_GUEST);
         clickOnElement(BUTTON_CONTINUE_AS_GUEST, "Guest Checkout button");
     }
 
+    /** ---------------------------   END: EXECUTION METHODS   --------------------------- */
 
-    /**
+
+
+    /** ---------------------------   START: EXPECTED RESULTS   --------------------------- */
+
+
+    /** ---------------------------   END: EXPECTED RESULTS   --------------------------- */
+
+
+
+    /** ---------------------------   START: Verifications methods    --------------------------- */
+
+    /** ---------------------------   END: Verifications methods    --------------------------- */
+
+
+
+
+
+
+
+    /** ---------------------------   START: LOCATORS UNUSED   --------------------------- */
+    //FOR REGISTERED USER/
+    public static final By FIELD_LOGIN_FORM_CHECKOUT_EMAIL = By.id("login-email");
+    public static final By FIELD_LOGIN_FORM_CHECKOUT_PASSWORD = By.id("login-password");
+    public static final By BUTTON_LOGIN_FORM_CHECKOUT_LOGIN = By.id("jcheckout-login-button");
+    /** ---------------------------   END: LOCATORS UNUSED   --------------------------- */
+
+
+    /** ---------------------------   START: METHODS THAT CAN BE USEFUL   --------------------------- */
+
+    /**METHODS FOR REGISTERED USER
+
+     /**
      * Makes customer logged in on checkout page with specified Email and Password.
      * Emulates actions on frontend which user have to perform to log in on checkout page.
      *
@@ -90,5 +116,7 @@ public class CheckoutLoginPage extends PageFactory {
         //logger.info("Waiting for success message");
         //waitForElementIsVisible(WELCOME_ELEMENT);
     }
+
+    /** ---------------------------   END: METHODS THAT CAN BE USEFUL   --------------------------- */
 
 }
