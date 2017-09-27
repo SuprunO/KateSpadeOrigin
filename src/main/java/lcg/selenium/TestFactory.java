@@ -32,21 +32,24 @@
 
 package lcg.selenium;
 
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.saucelabs.common.SauceOnDemandAuthentication;
 import com.saucelabs.common.SauceOnDemandSessionIdProvider;
 import com.saucelabs.junit.SauceOnDemandTestWatcher;
 import com.thoughtworks.selenium.SeleniumLogLevels;
 import lcg.selenium.pages.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
+import org.junit.*;
 import org.junit.rules.TestName;
 import org.junit.rules.TestWatcher;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -58,6 +61,8 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -66,6 +71,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -95,6 +101,9 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     private static String browser;
     private static String buildDir;
     private static String testResultsDir;
+
+    private static ExtentReports extent;
+    private static ExtentTest test;
 
 
     protected WebDriver driver;
@@ -136,6 +145,9 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     @Rule
     public TestName testName = new TestName();
 
+//    @Rule
+//    public ScreenShotOnFailure failure = new ScreenShotOnFailure(driver);
+
 
     /**
      * Custom test Rule to create single {@link TestWatcher} Rule based on
@@ -159,6 +171,8 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         logTestResultError("Test: " + testCaseName + " failed!");
         logTestOutputToXML();
         logger.info("=====================================================================");
+
+        test.pass(FAILED);
     }
 
     protected static void successActions() {
@@ -167,6 +181,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         logTestOutputToXML();
         //TODO: move to the line decorator method with automatic length calculation
         logger.info("=====================================================================");
+        test.pass(PASSED);
     }
 
     /**
@@ -175,6 +190,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
     @BeforeClass
     public static void setUpClass() {
         setupParamsFromCmd();
+        extent = ExtentManager.GetExtent();
     }
 
     /**
@@ -196,6 +212,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         logger.info("Start Browser... (done) | time=" + duration + "ms");
         setTestCaseName(testName.getMethodName());
         setStartTimeMark(); //for new test
+        test = extent.createTest(testCaseName, "Some Hardcoded value");
         log("Starting test... " + testCaseName);
     }
 
@@ -547,6 +564,13 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
         driver.quit();
     }
 
+    @AfterClass
+    public static void tearDownClass() {
+        //extent.endTest(test);//earlier version
+        extent.flush();
+        //extent.close();
+    }
+
     /**
      * Log to test output and logger.info
      *
@@ -554,7 +578,9 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      */
     public static void log(String msg) {
         logger.info(msg);
+        test.log(Status.INFO, msg); //extent
         testOutput += msg + "\n";
+
     }
 
     /**
@@ -564,6 +590,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      */
     public static void logTestResult(String msg) {
         logger.info(msg);
+        test.log(Status.INFO, msg); //extent
         testResults += msg + "\n";
     }
 
@@ -574,6 +601,7 @@ public abstract class TestFactory implements SauceOnDemandSessionIdProvider {
      */
     public static void logTestResultError(String msg) {
         logger.error(msg);
+        test.log(Status.FAIL, msg); //extent
         testResults += msg + "\n";
     }
 

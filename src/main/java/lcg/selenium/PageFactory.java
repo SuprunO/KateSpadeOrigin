@@ -89,7 +89,7 @@ public abstract class PageFactory {
     public static final String TEST_CARD_NUMBER = "4111111111111111";
 
     public static final String TEST_CARD_TYPE = "Visa";
-    public static final String TEST_CARD_MONTHYEAR = "1212";
+    public static final String TEST_CARD_MONTHYEAR = "1210";
     public static final String TEST_CARD_CVV = "123";
 
     //Test Address information

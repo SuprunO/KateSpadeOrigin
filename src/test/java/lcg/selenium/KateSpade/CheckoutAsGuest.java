@@ -32,7 +32,9 @@
 
 package lcg.selenium.KateSpade;
 
+import lcg.selenium.ScreenShotOnFailure;
 import lcg.selenium.TestFactory;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -42,11 +44,14 @@ import org.junit.Test;
  */
 public class CheckoutAsGuest extends TestFactory {
 
+    @Rule
+    public ScreenShotOnFailure screenshotTestRule = new ScreenShotOnFailure(driver);
+
     /**
      * Test requirement: Guest Visitors have ability to place order
      */
     @Test
-    public void testGuestCanPlaceOrder() {
+    public void testGuestCanPlaceOrderFailed() {
         log("Starting test.... " + testCaseName);
         log("Starting test: Guest Visitors have ability to place order");
         log("Test description: ");
@@ -58,18 +63,48 @@ public class CheckoutAsGuest extends TestFactory {
         homePage().open();
         productDetailsPage().openById("PXRU8215");
         productDetailsPage().clickButtonAddToCart();
+        header().clickCheckoutButtonInMiniCart();
         log("@Given step: PASSED!");
         log("Stating step: ");
         log("@When: I go to Checkout as Guest");
-        header().clickCheckoutButtonInMiniCart();
         shoppingCartPage().clickProceedToCheckoutButton();
+        checkoutLoginPage().clickButtonContinueAsGuest();
         log("@When step: PASSED!");
         log("Stating step: ");
         log("@Then: I can fill all correct information and place order.");
-        checkoutLoginPage().clickButtonContinueAsGuest();
         checkoutShippingPage().fillShippingAddressForm("IL - Illinois");
         checkoutBillingPage().fillBillingCCForm();
         checkoutOrderReviewPage().verifyShippingAddressHeaderisPresent();
+
+        log("@Then step: PASSED!");
+    }
+
+    /**
+     * Test requirement: Copy of previos test - to show passed example
+     */
+    @Test
+    public void testGuestCanPlaceOrderPassed() {
+        log("Starting test.... " + testCaseName);
+        log("Starting test: Guest Visitors have ability to place order");
+        log("Test description: ");
+        log("@Given: I am on \"Shopping Bag\" page as Guest with random product in cart.");
+        log("@When: I go to Checkout as Guest");
+        log("@Then: I can fill all correct information and place order.");
+        log("Stating step: ");
+        log("@Given: I am on \"Shopping Bag\" page as Guest with random product in cart.");
+        homePage().open();
+        productDetailsPage().openById("PXRU8215");
+        productDetailsPage().clickButtonAddToCart();
+        header().clickCheckoutButtonInMiniCart();
+        log("@Given step: PASSED!");
+        log("Stating step: ");
+        log("@When: I go to Checkout as Guest");
+        shoppingCartPage().clickProceedToCheckoutButton();
+        checkoutLoginPage().clickButtonContinueAsGuest();
+        log("@When step: PASSED!");
+        log("Stating step: ");
+        log("@Then: I can fill all correct information and place order.");
+        checkoutShippingPage().fillShippingAddressForm("IL - Illinois");
 
         log("@Then step: PASSED!");
     }
